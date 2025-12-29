@@ -1,7 +1,10 @@
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 
 export default function NewsBanners() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
   const banners = [
     {
       id: 1,
@@ -32,15 +35,40 @@ export default function NewsBanners() {
     }
   ];
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % banners.length);
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, [banners.length]);
+
+  const goToSlide = (index: number) => {
+    setCurrentSlide(index);
+  };
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % banners.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + banners.length) % banners.length);
+  };
+
   return (
     <section className="py-16 md:py-24">
       <div className="container mx-auto px-6">
-        <div className="space-y-6">
+        <div className="relative overflow-hidden rounded-2xl h-[400px] md:h-[500px] group">
           {banners.map((banner, idx) => (
             <div
               key={banner.id}
-              className="relative overflow-hidden rounded-2xl h-[300px] md:h-[400px] group fade-on-scroll"
-              style={{ animationDelay: `${idx * 100}ms` }}
+              className={`absolute inset-0 transition-all duration-700 ${
+                idx === currentSlide 
+                  ? 'opacity-100 translate-x-0' 
+                  : idx < currentSlide 
+                    ? 'opacity-0 -translate-x-full' 
+                    : 'opacity-0 translate-x-full'
+              }`}
             >
               <div
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
@@ -72,6 +100,34 @@ export default function NewsBanners() {
               </div>
             </div>
           ))}
+
+          <button
+            onClick={prevSlide}
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
+          >
+            <Icon name="ChevronLeft" size={24} className="text-white" />
+          </button>
+
+          <button
+            onClick={nextSlide}
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
+          >
+            <Icon name="ChevronRight" size={24} className="text-white" />
+          </button>
+
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+            {banners.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => goToSlide(idx)}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  idx === currentSlide 
+                    ? 'bg-white w-8' 
+                    : 'bg-white/50 hover:bg-white/75'
+                }`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>
