@@ -46,6 +46,14 @@ export default function ContentSections() {
     { id: 'zippers', name: 'Молнии', icon: 'Minus' },
     { id: 'threads', name: 'Нитки', icon: 'Wind' },
     { id: 'accessories', name: 'Аксессуары', icon: 'Star' },
+    { id: 'ribbons', name: 'Ленты', icon: 'Ribbon' },
+    { id: 'metal', name: 'Металлическая фурнитура', icon: 'Hammer' },
+    { id: 'plastic', name: 'Пластиковая фурнитура', icon: 'Blocks' },
+    { id: 'shoulder', name: 'Подплечники', icon: 'Triangle' },
+    { id: 'underwear', name: 'Бельевая фурнитура', icon: 'Shirt' },
+    { id: 'cords', name: 'Шнуры', icon: 'Cable' },
+    { id: 'lining', name: 'Подкладки', icon: 'Layers' },
+    { id: 'bags', name: 'Пакеты', icon: 'ShoppingBag' },
   ];
 
   const products = [
