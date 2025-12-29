@@ -59,7 +59,7 @@ export default function HeroSection() {
             </div>
             <div className="h-12 w-px bg-border"></div>
             <div>
-              <div className="text-3xl font-bold text-primary">10 лет</div>
+              <div className="text-3xl font-bold text-primary">25+ лет</div>
               <div className="text-sm text-muted-foreground">На рынке</div>
             </div>
             <div className="h-12 w-px bg-border"></div>
