@@ -35,6 +35,21 @@ export default function CatalogSection() {
     { id: 'bags', name: 'Пакеты', icon: 'ShoppingBag' },
   ];
 
+  const mainCategories = [
+    { id: 'buttons', name: 'Пуговицы', icon: 'Circle', image: 'https://cdn.poehali.dev/projects/e7e9e9b8-0dff-4ddf-a7ac-0d94918f3cc7/files/c216cdcd-1943-4798-bafa-d1c0c450e192.jpg' },
+    { id: 'zippers', name: 'Молнии', icon: 'Minus', image: 'https://cdn.poehali.dev/projects/e7e9e9b8-0dff-4ddf-a7ac-0d94918f3cc7/files/4473f4ad-8901-4428-a3f8-a55f2b17184f.jpg' },
+    { id: 'threads', name: 'Нитки', icon: 'Wind', image: 'https://cdn.poehali.dev/projects/e7e9e9b8-0dff-4ddf-a7ac-0d94918f3cc7/files/48424235-062c-44e5-b4ec-a0df90b538da.jpg' },
+    { id: 'accessories', name: 'Аксессуары', icon: 'Star', image: 'https://cdn.poehali.dev/projects/e7e9e9b8-0dff-4ddf-a7ac-0d94918f3cc7/files/c216cdcd-1943-4798-bafa-d1c0c450e192.jpg' },
+    { id: 'ribbons', name: 'Ленты', icon: 'Ribbon', image: 'https://cdn.poehali.dev/projects/e7e9e9b8-0dff-4ddf-a7ac-0d94918f3cc7/files/48424235-062c-44e5-b4ec-a0df90b538da.jpg' },
+    { id: 'metal', name: 'Металлическая фурнитура', icon: 'Hammer', image: 'https://cdn.poehali.dev/projects/e7e9e9b8-0dff-4ddf-a7ac-0d94918f3cc7/files/4473f4ad-8901-4428-a3f8-a55f2b17184f.jpg' },
+    { id: 'plastic', name: 'Пластиковая фурнитура', icon: 'Blocks', image: 'https://cdn.poehali.dev/projects/e7e9e9b8-0dff-4ddf-a7ac-0d94918f3cc7/files/c216cdcd-1943-4798-bafa-d1c0c450e192.jpg' },
+    { id: 'shoulder', name: 'Подплечники', icon: 'Triangle', image: 'https://cdn.poehali.dev/projects/e7e9e9b8-0dff-4ddf-a7ac-0d94918f3cc7/files/48424235-062c-44e5-b4ec-a0df90b538da.jpg' },
+    { id: 'underwear', name: 'Бельевая фурнитура', icon: 'Shirt', image: 'https://cdn.poehali.dev/projects/e7e9e9b8-0dff-4ddf-a7ac-0d94918f3cc7/files/48424235-062c-44e5-b4ec-a0df90b538da.jpg' },
+    { id: 'cords', name: 'Шнуры', icon: 'Cable', image: 'https://cdn.poehali.dev/projects/e7e9e9b8-0dff-4ddf-a7ac-0d94918f3cc7/files/48424235-062c-44e5-b4ec-a0df90b538da.jpg' },
+    { id: 'lining', name: 'Подкладки', icon: 'Layers', image: 'https://cdn.poehali.dev/projects/e7e9e9b8-0dff-4ddf-a7ac-0d94918f3cc7/files/48424235-062c-44e5-b4ec-a0df90b538da.jpg' },
+    { id: 'bags', name: 'Пакеты', icon: 'ShoppingBag', image: 'https://cdn.poehali.dev/projects/e7e9e9b8-0dff-4ddf-a7ac-0d94918f3cc7/files/c216cdcd-1943-4798-bafa-d1c0c450e192.jpg' },
+  ];
+
   const products = [
     { id: 1, name: 'Пуговицы перламутровые', category: 'buttons', price: '120 ₽', image: 'https://cdn.poehali.dev/projects/e7e9e9b8-0dff-4ddf-a7ac-0d94918f3cc7/files/c216cdcd-1943-4798-bafa-d1c0c450e192.jpg' },
     { id: 2, name: 'Молния металлическая', category: 'zippers', price: '180 ₽', image: 'https://cdn.poehali.dev/projects/e7e9e9b8-0dff-4ddf-a7ac-0d94918f3cc7/files/4473f4ad-8901-4428-a3f8-a55f2b17184f.jpg' },
@@ -77,6 +92,44 @@ export default function CatalogSection() {
           <div className="fade-on-scroll max-w-3xl mx-auto text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">Каталог продукции</h2>
             <p className="text-lg text-muted-foreground">Широкий выбор швейной фурнитуры для любых задач</p>
+          </div>
+
+          <div className="fade-on-scroll grid grid-cols-1 md:grid-cols-2 gap-6 mb-16 max-w-5xl mx-auto">
+            {mainCategories.map((category, idx) => (
+              <Card
+                key={category.id}
+                className="group cursor-pointer overflow-hidden hover:shadow-2xl transition-all duration-300 border-2 hover:border-primary/50"
+                style={{ animationDelay: `${idx * 50}ms` }}
+                onClick={() => setActiveCategory(category.id)}
+              >
+                <CardContent className="p-0">
+                  <div className="grid grid-cols-[140px_1fr] items-center">
+                    <div className="relative h-full min-h-[140px] bg-gradient-to-br from-primary/5 to-primary/20 flex items-center justify-center overflow-hidden">
+                      <div className="absolute inset-0 opacity-20">
+                        <img 
+                          src={category.image} 
+                          alt={category.name}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      </div>
+                      <Icon name={category.icon as any} size={56} className="text-primary relative z-10" />
+                    </div>
+                    <div className="p-6">
+                      <h3 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">
+                        {category.name}
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        Большой выбор качественной фурнитуры
+                      </p>
+                      <div className="flex items-center text-primary font-medium text-sm">
+                        Смотреть товары
+                        <Icon name="ArrowRight" size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
 
           <div className="fade-on-scroll flex flex-wrap justify-center gap-3 mb-12">
