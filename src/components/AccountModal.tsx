@@ -59,7 +59,7 @@ export default function AccountModal({ open, onOpenChange }: AccountModalProps) 
               </CardHeader>
             </Card>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card>
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3">
@@ -83,20 +83,6 @@ export default function AccountModal({ open, onOpenChange }: AccountModalProps) 
                     <div>
                       <p className="text-2xl font-bold">8</p>
                       <p className="text-sm text-muted-foreground">Избранное</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <Icon name="Award" size={24} className="text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold">450</p>
-                      <p className="text-sm text-muted-foreground">Бонусов</p>
                     </div>
                   </div>
                 </CardContent>
