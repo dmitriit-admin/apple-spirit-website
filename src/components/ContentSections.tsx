@@ -626,9 +626,7 @@ export default function ContentSections() {
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-lg mb-3">Адрес</h3>
-                        <p className="text-foreground leading-relaxed mb-3">
-                          г. Москва, ул. Примерная, д. 123, офис 45
-                        </p>
+                        <p className="text-foreground leading-relaxed mb-3">г. Москва, ул. Докукина д. 8 стр. 3</p>
                         <p className="text-sm text-muted-foreground">
                           3 минуты пешком от метро «Примерная»
                         </p>
@@ -652,11 +650,11 @@ export default function ContentSections() {
                           </div>
                           <div className="flex justify-between items-center">
                             <span className="text-muted-foreground">Суббота</span>
-                            <span className="font-medium">10:00 - 16:00</span>
+                            <span className="font-medium text-red-500">Выходной</span>
                           </div>
                           <div className="flex justify-between items-center">
                             <span className="text-muted-foreground">Воскресенье</span>
-                            <span className="font-medium text-destructive">Выходной</span>
+                            <span className="font-medium text-red-500">Выходной</span>
                           </div>
                         </div>
                         <div className="mt-4 pt-4 border-t">
