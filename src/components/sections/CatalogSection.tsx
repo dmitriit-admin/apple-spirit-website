@@ -13,9 +13,13 @@ interface Product {
   image: string;
 }
 
-export default function CatalogSection() {
+interface CatalogSectionProps {
+  initialCategory?: string;
+}
+
+export default function CatalogSection({ initialCategory = 'all' }: CatalogSectionProps) {
   const { addToCart } = useCart();
-  const [activeCategory, setActiveCategory] = useState('all');
+  const [activeCategory, setActiveCategory] = useState(initialCategory);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 

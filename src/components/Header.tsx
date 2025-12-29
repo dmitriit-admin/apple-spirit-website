@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { Badge } from '@/components/ui/badge';
@@ -9,33 +10,43 @@ import AccountModal from '@/components/AccountModal';
 
 export default function Header() {
   const { totalItems } = useCart();
+  const location = useLocation();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
+
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
         <nav className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="text-2xl font-bold tracking-tight">ТК Эксклюзив</div>
+            <Link to="/" className="text-2xl font-bold tracking-tight hover:text-primary transition-colors">
+              ТК Эксклюзив
+            </Link>
             <div className="hidden md:flex items-center gap-6">
-              <a href="#catalog" className="text-sm font-medium hover:text-primary transition-colors">Каталог</a>
-              <a href="#promo" className="text-sm font-medium hover:text-primary transition-colors">Акции</a>
-              <a href="#blog" className="text-sm font-medium hover:text-primary transition-colors">Блог</a>
+              <Link to="/catalog" className={`text-sm font-medium hover:text-primary transition-colors ${isActive('/catalog') ? 'text-primary' : ''}`}>
+                Каталог
+              </Link>
+              <Link to="/about" className={`text-sm font-medium hover:text-primary transition-colors ${isActive('/about') ? 'text-primary' : ''}`}>
+                О нас
+              </Link>
               <div className="relative group">
                 <button className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1">
-                  Информация
+                  Доставка и оплата
                   <Icon name="ChevronDown" size={16} className="transition-transform group-hover:rotate-180" />
                 </button>
                 <div className="absolute top-full left-0 mt-2 w-48 bg-background/95 backdrop-blur-lg border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                  <a href="#about" className="block px-4 py-3 text-sm hover:bg-secondary/50 transition-colors rounded-t-lg">О нас</a>
-                  <a href="#delivery" className="block px-4 py-3 text-sm hover:bg-secondary/50 transition-colors">Доставка</a>
-                  <a href="#payment" className="block px-4 py-3 text-sm hover:bg-secondary/50 transition-colors">Оплата</a>
-                  <a href="#contacts" className="block px-4 py-3 text-sm hover:bg-secondary/50 transition-colors rounded-b-lg">Контакты</a>
+                  <Link to="/delivery" className="block px-4 py-3 text-sm hover:bg-secondary/50 transition-colors rounded-t-lg">Доставка и оплата</Link>
                 </div>
               </div>
-              <Button size="sm">Связаться</Button>
+              <Link to="/contacts" className={`text-sm font-medium hover:text-primary transition-colors ${isActive('/contacts') ? 'text-primary' : ''}`}>
+                Контакты
+              </Link>
+              <Link to="/contacts">
+                <Button size="sm">Связаться</Button>
+              </Link>
               <button 
                 className="p-2 hover:bg-secondary rounded-lg transition-colors"
                 onClick={() => setIsAccountOpen(true)}
