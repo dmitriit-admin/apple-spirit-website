@@ -85,6 +85,10 @@ export default function CatalogSection() {
     ? products 
     : products.filter(p => p.category === activeCategory);
 
+  const getCategoryCount = (categoryId: string) => {
+    return products.filter(p => p.category === categoryId).length;
+  };
+
   return (
     <>
       <section id="catalog" className="py-24 md:py-32">
@@ -115,9 +119,15 @@ export default function CatalogSection() {
                       <Icon name={category.icon as any} size={56} className="text-primary relative z-10" />
                     </div>
                     <div className="p-6">
-                      <h3 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">
-                        {category.name}
-                      </h3>
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="text-2xl font-bold group-hover:text-primary transition-colors">
+                          {category.name}
+                        </h3>
+                        <div className="flex items-center gap-1 bg-primary/10 px-2 py-1 rounded-lg">
+                          <Icon name="Package" size={14} className="text-primary" />
+                          <span className="text-sm font-bold text-primary">{getCategoryCount(category.id)}</span>
+                        </div>
+                      </div>
                       <p className="text-sm text-muted-foreground mb-3">
                         Большой выбор качественной фурнитуры
                       </p>
