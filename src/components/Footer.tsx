@@ -37,6 +37,9 @@ export default function Footer() {
                 <Link to="/catalog" className="hover:text-primary transition-colors">Каталог</Link>
               </li>
               <li>
+                <Link to="/blog" className="hover:text-primary transition-colors">Блог</Link>
+              </li>
+              <li>
                 <Link to="/delivery" className="hover:text-primary transition-colors">Доставка</Link>
               </li>
               <li>

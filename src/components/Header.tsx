@@ -29,6 +29,9 @@ export default function Header() {
               <Link to="/catalog" className={`text-sm font-medium hover:text-primary transition-colors ${isActive('/catalog') ? 'text-primary' : ''}`}>
                 Каталог
               </Link>
+              <Link to="/blog" className={`text-sm font-medium hover:text-primary transition-colors ${isActive('/blog') ? 'text-primary' : ''}`}>
+                Блог
+              </Link>
               <Link to="/about" className={`text-sm font-medium hover:text-primary transition-colors ${isActive('/about') ? 'text-primary' : ''}`}>
                 О нас
               </Link>
