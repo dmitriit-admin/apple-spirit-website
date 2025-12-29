@@ -106,46 +106,47 @@ export default function BlogPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {blogPosts.map((post, idx) => (
-              <Card 
-                key={post.id} 
-                className="fade-on-scroll group hover:shadow-xl transition-all duration-300 cursor-pointer"
-                style={{ animationDelay: `${idx * 100}ms` }}
-              >
-                <CardContent className="p-0">
-                  <div className="aspect-video bg-secondary overflow-hidden">
-                    <img 
-                      src={post.image}
-                      alt={post.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
-                      <div className="flex items-center gap-1">
-                        <Icon name="Calendar" size={14} />
-                        <span>{post.date}</span>
+              <Link key={post.id} to={`/blog/${post.id}`}>
+                <Card 
+                  className="fade-on-scroll group hover:shadow-xl transition-all duration-300 cursor-pointer h-full"
+                  style={{ animationDelay: `${idx * 100}ms` }}
+                >
+                  <CardContent className="p-0">
+                    <div className="aspect-video bg-secondary overflow-hidden">
+                      <img 
+                        src={post.image}
+                        alt={post.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </div>
+                    <div className="p-6">
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
+                        <div className="flex items-center gap-1">
+                          <Icon name="Calendar" size={14} />
+                          <span>{post.date}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Icon name="Clock" size={14} />
+                          <span>{post.readTime}</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Icon name="Clock" size={14} />
-                        <span>{post.readTime}</span>
+                      <div className="inline-block px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full mb-3">
+                        {post.category}
+                      </div>
+                      <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors">
+                        {post.title}
+                      </h3>
+                      <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
+                        {post.excerpt}
+                      </p>
+                      <div className="flex items-center text-primary font-medium text-sm group-hover:gap-2 transition-all">
+                        Читать далее
+                        <Icon name="ArrowRight" size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
                       </div>
                     </div>
-                    <div className="inline-block px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full mb-3">
-                      {post.category}
-                    </div>
-                    <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors">
-                      {post.title}
-                    </h3>
-                    <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
-                      {post.excerpt}
-                    </p>
-                    <div className="flex items-center text-primary font-medium text-sm group-hover:gap-2 transition-all">
-                      Читать далее
-                      <Icon name="ArrowRight" size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
 
