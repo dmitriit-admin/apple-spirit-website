@@ -5,11 +5,13 @@ import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/contexts/CartContext';
 import CartDrawer from '@/components/CartDrawer';
 import SearchModal from '@/components/SearchModal';
+import AccountModal from '@/components/AccountModal';
 
 export default function Header() {
   const { totalItems } = useCart();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
 
   return (
     <>
@@ -34,6 +36,12 @@ export default function Header() {
               </div>
               <a href="#contacts" className="text-sm font-medium hover:text-primary transition-colors">Контакты</a>
               <Button size="sm">Связаться</Button>
+              <button 
+                className="p-2 hover:bg-secondary rounded-lg transition-colors"
+                onClick={() => setIsAccountOpen(true)}
+              >
+                <Icon name="User" size={22} />
+              </button>
               <button 
                 className="p-2 hover:bg-secondary rounded-lg transition-colors"
                 onClick={() => setIsSearchOpen(true)}
@@ -61,6 +69,7 @@ export default function Header() {
 
       <CartDrawer open={isCartOpen} onOpenChange={setIsCartOpen} />
       <SearchModal open={isSearchOpen} onOpenChange={setIsSearchOpen} />
+      <AccountModal open={isAccountOpen} onOpenChange={setIsAccountOpen} />
     </>
   );
 }
