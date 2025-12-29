@@ -498,32 +498,13 @@ export default function ContentSections() {
         <div className="container mx-auto px-6">
           <div className="max-w-2xl mx-auto">
             <div className="fade-on-scroll text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">Свяжитесь с нами</h2>
-              <p className="text-lg text-muted-foreground">Ответим на все вопросы и поможем с выбором</p>
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">Контакты</h2>
+              <p className="text-lg text-muted-foreground">Свяжитесь с нами удобным способом</p>
             </div>
 
             <Card className="fade-on-scroll">
               <CardContent className="p-8">
-                <form className="space-y-6">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Ваше имя</label>
-                    <Input placeholder="Иван Иванов" className="h-12" />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Email</label>
-                    <Input type="email" placeholder="ivan@example.com" className="h-12" />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Сообщение</label>
-                    <Textarea placeholder="Расскажите о ваших потребностях..." className="min-h-32 resize-none" />
-                  </div>
-                  <Button className="w-full h-12 text-base" size="lg">
-                    Отправить сообщение
-                    <Icon name="Send" className="ml-2" size={18} />
-                  </Button>
-                </form>
-
-                <div className="mt-8 pt-8 border-t border-border space-y-6">
+                <div className="space-y-6">
                   <div>
                     <div className="flex items-center gap-2 mb-3">
                       <Icon name="Phone" size={20} className="text-primary" />
