@@ -523,19 +523,41 @@ export default function ContentSections() {
                   </Button>
                 </form>
 
-                <div className="mt-8 pt-8 border-t border-border">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                    <div>
-                      <Icon name="Phone" size={24} className="mx-auto mb-2 text-primary" />
-                      <div className="text-sm font-medium">+7 (495) 123-45-67</div>
+                <div className="mt-8 pt-8 border-t border-border space-y-6">
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Icon name="Phone" size={20} className="text-primary" />
+                      <span className="font-semibold">Телефоны:</span>
                     </div>
-                    <div>
-                      <Icon name="Mail" size={24} className="mx-auto mb-2 text-primary" />
-                      <div className="text-sm font-medium">info@shveypro.ru</div>
+                    <div className="space-y-2 ml-7">
+                      <div className="text-sm">
+                        <a href="tel:+79261081492" className="hover:text-primary transition-colors">8 (926) 108-14-92</a>
+                      </div>
+                      <div className="text-sm">
+                        <a href="tel:+79264309208" className="hover:text-primary transition-colors">8 (926) 430-92-08</a>
+                      </div>
+                      <div className="text-sm">
+                        <a href="tel:+78005007527" className="hover:text-primary transition-colors font-medium">8 (800) 500-75-27</a>
+                        <span className="text-xs text-muted-foreground ml-2">— бесплатный</span>
+                      </div>
                     </div>
-                    <div>
-                      <Icon name="MapPin" size={24} className="mx-auto mb-2 text-primary" />
-                      <div className="text-sm font-medium">Москва, ул. Примерная, 123</div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Icon name="Mail" size={20} className="text-primary" />
+                      <span className="font-semibold">Email:</span>
+                    </div>
+                    <div className="space-y-2 ml-7">
+                      <div className="text-sm">
+                        <a href="mailto:info@tkexclusiv.ru" className="hover:text-primary transition-colors">info@tkexclusiv.ru</a>
+                      </div>
+                      <div className="text-sm">
+                        <a href="mailto:ya.exc03@yandex.ru" className="hover:text-primary transition-colors">ya.exc03@yandex.ru</a>
+                      </div>
+                      <div className="text-sm">
+                        <a href="mailto:ya.exc08@yandex.ru" className="hover:text-primary transition-colors">ya.exc08@yandex.ru</a>
+                      </div>
                     </div>
                   </div>
                 </div>
