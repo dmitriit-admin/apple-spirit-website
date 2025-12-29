@@ -626,9 +626,11 @@ export default function ContentSections() {
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-lg mb-3">Адрес</h3>
-                        <p className="text-foreground leading-relaxed mb-3">г. Москва, ул. Докукина д. 8 стр. 3</p>
+                        <p className="text-foreground leading-relaxed mb-3">
+                          г. Москва, ул. Докукина, д. 8, стр. 3
+                        </p>
                         <p className="text-sm text-muted-foreground">
-                          3 минуты пешком от метро «Примерная»
+                          5 минут пешком от метро «Бауманская»
                         </p>
                       </div>
                     </div>
@@ -694,7 +696,7 @@ export default function ContentSections() {
                 <CardContent className="p-0">
                   <div className="aspect-[16/9] w-full">
                     <iframe
-                      src="https://yandex.ru/map-widget/v1/?um=constructor%3A64b3dfe32e8c8f3f8c3c3b3a3b3b3b3b&amp;source=constructor"
+                      src="https://yandex.ru/map-widget/v1/?ll=37.680744%2C55.771899&mode=search&ol=geo&ouri=ymapsbm1%3A%2F%2Fgeo%3Fdata%3DCgg1NzA2ODU0MhJE0KDQvtGB0YHQuNGPLCDQnNC-0YHQutCy0LAsINGD0LvQuNGG0LAg0JTQvtC60YPQutC40L3QsCwgOCDRgdGC0YDQvtC10L3QuNC1IDMiCg1L6V9CFfvDXEI%2C&z=17"
                       width="100%"
                       height="100%"
                       frameBorder="0"
@@ -702,7 +704,7 @@ export default function ContentSections() {
                       allowFullScreen
                       loading="lazy"
                       referrerPolicy="no-referrer-when-downgrade"
-                      title="Наше местоположение"
+                      title="ТК Эксклюзив - г. Москва, ул. Докукина, д. 8, стр. 3"
                       className="w-full h-full"
                     />
                   </div>
