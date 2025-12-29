@@ -79,8 +79,25 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="pt-8 border-t border-border text-center">
-          <p className="text-sm text-muted-foreground">© 2024 ТК Эксклюзив. Все права защищены.</p>
+        <div className="pt-8 border-t border-border">
+          <div className="bg-secondary/50 rounded-lg p-6 mb-6">
+            <h3 className="font-semibold mb-4 text-center">Реквизиты компании</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-muted-foreground max-w-4xl mx-auto">
+              <div><span className="font-medium">Полное наименование:</span> ООО Торговая Компания «ЭКСКЛЮЗИВ»</div>
+              <div><span className="font-medium">ИНН:</span> 7716634770</div>
+              <div><span className="font-medium">Юридический адрес:</span> 129226, Москва, ул. Докукина, д.8, стр.3</div>
+              <div><span className="font-medium">КПП:</span> 771601001</div>
+              <div><span className="font-medium">Расчетный счет:</span> 40702810300290001324</div>
+              <div><span className="font-medium">ОГРН:</span> 1097746018226 от 22.01.2009 г.</div>
+              <div><span className="font-medium">Банк:</span> филиал «Центральный» Банка ВТБ (ПАО), г. Москва</div>
+              <div><span className="font-medium">ОКПО:</span> 60375858</div>
+              <div><span className="font-medium">Корр. счет:</span> 30101810145250000411</div>
+              <div><span className="font-medium">ОКВЭД:</span> 51.41</div>
+              <div><span className="font-medium">БИК:</span> 044525411</div>
+              <div><span className="font-medium">ОКАТО:</span> 4528577000</div>
+            </div>
+          </div>
+          <p className="text-sm text-muted-foreground text-center">© 2024 ТК Эксклюзив. Все права защищены.</p>
         </div>
       </div>
     </footer>
