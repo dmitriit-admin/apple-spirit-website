@@ -1,0 +1,32 @@
+{
+  "tests": [
+    {
+      "name": "Send notification request",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "productName": "Пуговицы перламутровые",
+        "email": "customer@example.com",
+        "phone": "+79261234567"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Missing email",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "productName": "Молния металлическая"
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

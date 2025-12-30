@@ -15,16 +15,43 @@ export default function NotifyModal({ open, onOpenChange, productName }: NotifyM
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      setEmail('');
-      setPhone('');
-      onOpenChange(false);
-    }, 2000);
+    setLoading(true);
+    
+    try {
+      const response = await fetch('https://functions.poehali.dev/c602eb81-eda7-4bfe-a998-757caf7fae60', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          productName,
+          email,
+          phone,
+        }),
+      });
+      
+      if (response.ok) {
+        setSubmitted(true);
+        setTimeout(() => {
+          setSubmitted(false);
+          setEmail('');
+          setPhone('');
+          onOpenChange(false);
+        }, 2000);
+      } else {
+        console.error('Failed to send notification');
+        alert('Ошибка при отправке. Попробуйте позже.');
+      }
+    } catch (error) {
+      console.error('Error sending notification:', error);
+      alert('Ошибка при отправке. Проверьте интернет-соединение.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -60,9 +87,18 @@ export default function NotifyModal({ open, onOpenChange, productName }: NotifyM
                   onChange={(e) => setPhone(e.target.value)}
                 />
               </div>
-              <Button type="submit" className="w-full" size="lg">
-                <Icon name="Bell" size={18} className="mr-2" />
-                Уведомить о поступлении
+              <Button type="submit" className="w-full" size="lg" disabled={loading}>
+                {loading ? (
+                  <>
+                    <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
+                    Отправка...
+                  </>
+                ) : (
+                  <>
+                    <Icon name="Bell" size={18} className="mr-2" />
+                    Уведомить о поступлении
+                  </>
+                )}
               </Button>
             </form>
           </>
