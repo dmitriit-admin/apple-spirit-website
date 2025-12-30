@@ -47,7 +47,7 @@ export default function HeroSection() {
 
           <div className="mt-12 flex items-center gap-8">
             <div>
-              <div className="text-3xl font-bold text-primary">5000+</div>
+              <div className="text-3xl font-bold text-primary">10000+</div>
               <div className="text-sm text-muted-foreground">Довольных клиентов</div>
             </div>
             <div className="h-12 w-px bg-border"></div>
