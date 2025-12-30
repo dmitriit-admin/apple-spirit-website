@@ -23,6 +23,12 @@ export default function ContactsSection() {
                     <div className="flex-1">
                       <h3 className="font-semibold text-lg mb-3">Телефоны</h3>
                       <div className="space-y-2">
+                        <div className="pb-1">
+                          <a href="tel:+78005007527" className="text-primary hover:text-primary/80 transition-colors font-bold text-lg">
+                            8 (800) 500-75-27
+                          </a>
+                          <span className="block text-xs text-muted-foreground mt-1">Бесплатный звонок по России</span>
+                        </div>
                         <div>
                           <a href="tel:+79261081492" className="text-foreground hover:text-primary transition-colors font-medium">
                             8 (926) 108-14-92
@@ -32,12 +38,6 @@ export default function ContactsSection() {
                           <a href="tel:+79264309208" className="text-foreground hover:text-primary transition-colors font-medium">
                             8 (926) 430-92-08
                           </a>
-                        </div>
-                        <div className="pt-1">
-                          <a href="tel:+78005007527" className="text-primary hover:text-primary/80 transition-colors font-bold text-lg">
-                            8 (800) 500-75-27
-                          </a>
-                          <span className="block text-xs text-muted-foreground mt-1">Бесплатный звонок по России</span>
                         </div>
                       </div>
                     </div>
