@@ -46,7 +46,7 @@ export default function AboutPage() {
               </p>
               <div className="grid grid-cols-3 gap-8 mt-8">
                 <div>
-                  <div className="text-4xl font-bold text-primary mb-2">5000+</div>
+                  <div className="text-4xl font-bold text-primary mb-2">10000+</div>
                   <div className="text-sm text-muted-foreground">Клиентов</div>
                 </div>
                 <div>
@@ -54,7 +54,7 @@ export default function AboutPage() {
                   <div className="text-sm text-muted-foreground">Товаров</div>
                 </div>
                 <div>
-                  <div className="text-4xl font-bold text-primary mb-2">10+</div>
+                  <div className="text-4xl font-bold text-primary mb-2">25+</div>
                   <div className="text-sm text-muted-foreground">Лет работы</div>
                 </div>
               </div>
