@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AccountModalProps {
   open: boolean;
@@ -13,29 +14,76 @@ interface AccountModalProps {
 }
 
 export default function AccountModal({ open, onOpenChange }: AccountModalProps) {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, isAuthenticated, login, register, logout } = useAuth();
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [registerName, setRegisterName] = useState('');
+  const [registerEmail, setRegisterEmail] = useState('');
+  const [registerPassword, setRegisterPassword] = useState('');
+  const [registerPasswordConfirm, setRegisterPasswordConfirm] = useState('');
+  const [registerPhone, setRegisterPhone] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [registerLoading, setRegisterLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoggedIn(true);
+    setError('');
+    setLoginLoading(true);
+
+    try {
+      await login(loginEmail, loginPassword);
+      setLoginEmail('');
+      setLoginPassword('');
+    } catch (err: any) {
+      setError(err.message || 'Ошибка входа');
+    } finally {
+      setLoginLoading(false);
+    }
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoggedIn(true);
+    setError('');
+
+    if (registerPassword !== registerPasswordConfirm) {
+      setError('Пароли не совпадают');
+      return;
+    }
+
+    if (registerPassword.length < 6) {
+      setError('Пароль должен быть не менее 6 символов');
+      return;
+    }
+
+    setRegisterLoading(true);
+
+    try {
+      await register(registerEmail, registerPassword, registerName, registerPhone);
+      setRegisterName('');
+      setRegisterEmail('');
+      setRegisterPassword('');
+      setRegisterPasswordConfirm('');
+      setRegisterPhone('');
+    } catch (err: any) {
+      setError(err.message || 'Ошибка регистрации');
+    } finally {
+      setRegisterLoading(false);
+    }
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
+  const handleLogout = async () => {
+    await logout();
+    onOpenChange(false);
   };
 
-  if (isLoggedIn) {
+  if (isAuthenticated && user) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Личный кабинет</DialogTitle>
-            <DialogDescription>Управление вашим аккаунтом и заказами</DialogDescription>
+            <DialogDescription>Управление вашим аккаунтом</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-6">
@@ -47,8 +95,11 @@ export default function AccountModal({ open, onOpenChange }: AccountModalProps) 
                       <Icon name="User" size={32} className="text-primary" />
                     </div>
                     <div>
-                      <CardTitle>Иван Петров</CardTitle>
-                      <CardDescription>ivan.petrov@example.com</CardDescription>
+                      <CardTitle>{user.name}</CardTitle>
+                      <CardDescription>{user.email}</CardDescription>
+                      {user.phone && (
+                        <CardDescription className="mt-1">{user.phone}</CardDescription>
+                      )}
                     </div>
                   </div>
                   <Button variant="outline" size="sm" onClick={handleLogout}>
@@ -67,7 +118,7 @@ export default function AccountModal({ open, onOpenChange }: AccountModalProps) 
                       <Icon name="Package" size={24} className="text-primary" />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold">12</p>
+                      <p className="text-2xl font-bold">0</p>
                       <p className="text-sm text-muted-foreground">Заказов</p>
                     </div>
                   </div>
@@ -81,7 +132,7 @@ export default function AccountModal({ open, onOpenChange }: AccountModalProps) 
                       <Icon name="Heart" size={24} className="text-primary" />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold">8</p>
+                      <p className="text-2xl font-bold">0</p>
                       <p className="text-sm text-muted-foreground">Избранное</p>
                     </div>
                   </div>
@@ -91,30 +142,13 @@ export default function AccountModal({ open, onOpenChange }: AccountModalProps) 
 
             <Card>
               <CardHeader>
-                <CardTitle>Последние заказы</CardTitle>
+                <CardTitle>История заказов</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {[
-                    { id: '#12845', date: '15 декабря 2024', status: 'Доставлен', price: '2 450 ₽' },
-                    { id: '#12744', date: '8 декабря 2024', status: 'В пути', price: '1 890 ₽' },
-                    { id: '#12623', date: '1 декабря 2024', status: 'Доставлен', price: '3 200 ₽' },
-                  ].map((order) => (
-                    <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-secondary/50 transition-colors">
-                      <div>
-                        <p className="font-semibold">{order.id}</p>
-                        <p className="text-sm text-muted-foreground">{order.date}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-semibold">{order.price}</p>
-                        <p className="text-sm text-primary">{order.status}</p>
-                      </div>
-                    </div>
-                  ))}
+                <div className="text-center py-8 text-muted-foreground">
+                  <Icon name="Package" size={48} className="mx-auto mb-3 opacity-30" />
+                  <p>У вас пока нет заказов</p>
                 </div>
-                <Button variant="outline" className="w-full mt-4">
-                  Все заказы
-                </Button>
               </CardContent>
             </Card>
           </div>
@@ -131,6 +165,13 @@ export default function AccountModal({ open, onOpenChange }: AccountModalProps) 
           <DialogDescription>Войдите или создайте новый аккаунт</DialogDescription>
         </DialogHeader>
 
+        {error && (
+          <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm flex items-center gap-2">
+            <Icon name="AlertCircle" size={16} />
+            {error}
+          </div>
+        )}
+
         <Tabs defaultValue="login" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login">Вход</TabsTrigger>
@@ -141,18 +182,38 @@ export default function AccountModal({ open, onOpenChange }: AccountModalProps) 
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="login-email">Email</Label>
-                <Input id="login-email" type="email" placeholder="ivan@example.com" required />
+                <Input
+                  id="login-email"
+                  type="email"
+                  placeholder="ivan@example.com"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  required
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="login-password">Пароль</Label>
-                <Input id="login-password" type="password" placeholder="••••••••" required />
+                <Input
+                  id="login-password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  required
+                />
               </div>
-              <Button type="submit" className="w-full">
-                <Icon name="LogIn" size={16} className="mr-2" />
-                Войти
-              </Button>
-              <Button type="button" variant="link" className="w-full text-sm">
-                Забыли пароль?
+              <Button type="submit" className="w-full" disabled={loginLoading}>
+                {loginLoading ? (
+                  <>
+                    <Icon name="Loader2" size={16} className="mr-2 animate-spin" />
+                    Вход...
+                  </>
+                ) : (
+                  <>
+                    <Icon name="LogIn" size={16} className="mr-2" />
+                    Войти
+                  </>
+                )}
               </Button>
             </form>
           </TabsContent>
@@ -161,23 +222,70 @@ export default function AccountModal({ open, onOpenChange }: AccountModalProps) 
             <form onSubmit={handleRegister} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="register-name">Имя</Label>
-                <Input id="register-name" type="text" placeholder="Иван Петров" required />
+                <Input
+                  id="register-name"
+                  type="text"
+                  placeholder="Иван Петров"
+                  value={registerName}
+                  onChange={(e) => setRegisterName(e.target.value)}
+                  required
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="register-email">Email</Label>
-                <Input id="register-email" type="email" placeholder="ivan@example.com" required />
+                <Input
+                  id="register-email"
+                  type="email"
+                  placeholder="ivan@example.com"
+                  value={registerEmail}
+                  onChange={(e) => setRegisterEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="register-phone">Телефон (необязательно)</Label>
+                <Input
+                  id="register-phone"
+                  type="tel"
+                  placeholder="+7 (___) ___-__-__"
+                  value={registerPhone}
+                  onChange={(e) => setRegisterPhone(e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="register-password">Пароль</Label>
-                <Input id="register-password" type="password" placeholder="••••••••" required />
+                <Input
+                  id="register-password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={registerPassword}
+                  onChange={(e) => setRegisterPassword(e.target.value)}
+                  required
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="register-password-confirm">Подтвердите пароль</Label>
-                <Input id="register-password-confirm" type="password" placeholder="••••••••" required />
+                <Input
+                  id="register-password-confirm"
+                  type="password"
+                  placeholder="••••••••"
+                  value={registerPasswordConfirm}
+                  onChange={(e) => setRegisterPasswordConfirm(e.target.value)}
+                  required
+                />
               </div>
-              <Button type="submit" className="w-full">
-                <Icon name="UserPlus" size={16} className="mr-2" />
-                Зарегистрироваться
+              <Button type="submit" className="w-full" disabled={registerLoading}>
+                {registerLoading ? (
+                  <>
+                    <Icon name="Loader2" size={16} className="mr-2 animate-spin" />
+                    Регистрация...
+                  </>
+                ) : (
+                  <>
+                    <Icon name="UserPlus" size={16} className="mr-2" />
+                    Зарегистрироваться
+                  </>
+                )}
               </Button>
             </form>
           </TabsContent>
