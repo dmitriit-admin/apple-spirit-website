@@ -17,12 +17,12 @@ export default function NewsBanners() {
     },
     {
       id: 2,
-      title: 'Скидки до 40% на зимнюю коллекцию',
-      description: 'Специальное предложение на весь ассортимент подкладочных тканей и утеплителей до конца января 2025',
-      image: 'https://cdn.poehali.dev/projects/e7e9e9b8-0dff-4ddf-a7ac-0d94918f3cc7/files/48424235-062c-44e5-b4ec-a0df90b538da.jpg',
-      badge: 'Акция',
-      buttonText: 'К акциям',
-      gradient: 'from-accent/90 to-accent/70'
+      title: 'Поступление молний SBS',
+      description: 'В наличии новая партия качественных молний SBS. Широкий выбор размеров от 3 до 10. Доступны металлические и спиральные варианты',
+      image: 'https://cdn.poehali.dev/projects/e7e9e9b8-0dff-4ddf-a7ac-0d94918f3cc7/files/c2ff86fb-486d-448f-8e78-84a384408f20.jpg',
+      badge: 'Поступление',
+      buttonText: 'Смотреть молнии SBS',
+      gradient: 'from-green-600/90 to-green-500/70'
     },
     {
       id: 3,
