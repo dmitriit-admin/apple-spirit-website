@@ -80,6 +80,19 @@ def handler(event: dict, context) -> dict:
         elif method == 'DELETE' and item_id:
             return delete_banner(item_id)
 
+    # --- Promotions ---
+    if resource == 'promotions':
+        if method == 'GET':
+            return get_promotions()
+        elif method == 'POST':
+            return create_promotion(body)
+        elif method == 'PUT' and item_id:
+            return update_promotion(item_id, body)
+        elif method == 'PATCH' and item_id:
+            return patch_promotion(item_id, body)
+        elif method == 'DELETE' and item_id:
+            return delete_promotion(item_id)
+
     # --- Articles ---
     if resource == 'articles':
         if method == 'GET':
@@ -457,6 +470,99 @@ def delete_article(art_id):
         return resp(404, {'error': 'Статья не найдена'})
     return resp(200, {'deleted': art_id})
 
+
+# ---- Promotions ----
+
+def get_promotions():
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT * FROM promotions ORDER BY sort_order, id")
+            rows = cur.fetchall()
+    return resp(200, {'promotions': [dict(r) for r in rows]})
+
+
+def create_promotion(body):
+    title = body.get('title', '').strip()
+    if not title:
+        return resp(400, {'error': 'title обязателен'})
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                INSERT INTO promotions (title, description, badge, badge_value, button_text, button_url, expires_at, is_active, sort_order)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING *
+            """, (
+                title,
+                body.get('description'),
+                body.get('badge', 'СКИДКА'),
+                body.get('badge_value', ''),
+                body.get('button_text', 'Смотреть товары'),
+                body.get('button_url', '/catalog'),
+                body.get('expires_at', ''),
+                body.get('is_active', True),
+                body.get('sort_order', 0),
+            ))
+            row = dict(cur.fetchone())
+        conn.commit()
+    return resp(201, {'promotion': row})
+
+
+def update_promotion(promo_id, body):
+    title = body.get('title', '').strip()
+    if not title:
+        return resp(400, {'error': 'title обязателен'})
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                UPDATE promotions SET title=%s, description=%s, badge=%s, badge_value=%s,
+                    button_text=%s, button_url=%s, expires_at=%s, is_active=%s, sort_order=%s
+                WHERE id=%s RETURNING *
+            """, (
+                title,
+                body.get('description'),
+                body.get('badge', 'СКИДКА'),
+                body.get('badge_value', ''),
+                body.get('button_text', 'Смотреть товары'),
+                body.get('button_url', '/catalog'),
+                body.get('expires_at', ''),
+                body.get('is_active', True),
+                body.get('sort_order', 0),
+                promo_id,
+            ))
+            row = cur.fetchone()
+        conn.commit()
+    if not row:
+        return resp(404, {'error': 'Акция не найдена'})
+    return resp(200, {'promotion': dict(row)})
+
+
+def patch_promotion(promo_id, body):
+    fields, values = [], []
+    for k in ['title', 'description', 'badge', 'badge_value', 'button_text', 'button_url', 'expires_at', 'is_active', 'sort_order']:
+        if k in body:
+            fields.append(f"{k} = %s")
+            values.append(body[k])
+    if not fields:
+        return resp(400, {'error': 'Нет полей для обновления'})
+    values.append(promo_id)
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(f"UPDATE promotions SET {', '.join(fields)} WHERE id=%s RETURNING *", values)
+            row = cur.fetchone()
+        conn.commit()
+    if not row:
+        return resp(404, {'error': 'Акция не найдена'})
+    return resp(200, {'promotion': dict(row)})
+
+
+def delete_promotion(promo_id):
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM promotions WHERE id=%s RETURNING id", (promo_id,))
+            row = cur.fetchone()
+        conn.commit()
+    if not row:
+        return resp(404, {'error': 'Акция не найдена'})
+    return resp(200, {'deleted': promo_id})
 
 def patch_product(prod_id, body):
     fields, values = [], []

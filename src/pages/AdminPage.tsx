@@ -8,15 +8,17 @@ import CategoryPanel from './admin/CategoryPanel';
 import ProductPanel from './admin/ProductPanel';
 import BlogPanel, { Article } from './admin/BlogPanel';
 import BannersPanel, { Banner } from './admin/BannersPanel';
+import PromotionsPanel, { Promotion } from './admin/PromotionsPanel';
 
 export default function AdminPage() {
   const [adminKey, setAdminKey] = useState(() => localStorage.getItem('admin_key') || '');
   const [isAuth, setIsAuth] = useState(false);
-  const [tab, setTab] = useState<'categories' | 'products' | 'blog' | 'banners'>('categories');
+  const [tab, setTab] = useState<'categories' | 'products' | 'blog' | 'banners' | 'promotions'>('categories');
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
   const [banners, setBanners] = useState<Banner[]>([]);
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [loading, setLoading] = useState(false);
 
   const apiCall = async (method: string, resource: string, body?: object, id?: number | string) => {
@@ -101,12 +103,18 @@ export default function AdminPage() {
     if (data.banners) setBanners(data.banners as Banner[]);
   };
 
+  const loadPromotions = async () => {
+    const data = await apiCall('GET', 'promotions');
+    if (data.promotions) setPromotions(data.promotions as Promotion[]);
+  };
+
   useEffect(() => {
     if (isAuth) {
       loadCategories();
       loadProducts();
       loadArticles();
       loadBanners();
+      loadPromotions();
     }
   }, [isAuth]);
 
@@ -168,6 +176,13 @@ export default function AdminPage() {
             <Icon name="Image" size={16} className="mr-2" />
             Баннеры ({banners.length})
           </Button>
+          <Button
+            variant={tab === 'promotions' ? 'default' : 'outline'}
+            onClick={() => setTab('promotions')}
+          >
+            <Icon name="Tag" size={16} className="mr-2" />
+            Акции ({promotions.length})
+          </Button>
         </div>
 
         {tab === 'categories' ? (
@@ -197,13 +212,20 @@ export default function AdminPage() {
             uploadImage={uploadImage}
             onReload={loadArticles}
           />
-        ) : (
+        ) : tab === 'banners' ? (
           <BannersPanel
             banners={banners}
             loading={loading}
             apiCall={apiCall}
             uploadImage={uploadImage}
             onReload={loadBanners}
+          />
+        ) : (
+          <PromotionsPanel
+            promotions={promotions}
+            loading={loading}
+            apiCall={apiCall}
+            onReload={loadPromotions}
           />
         )}
 
