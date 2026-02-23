@@ -19,6 +19,9 @@ interface Product {
   price: string;
   image: string;
   inStock?: boolean;
+  sku?: string | null;
+  description?: string | null;
+  specifications?: Record<string, string> | null;
 }
 
 interface ProductModalProps {
@@ -40,22 +43,24 @@ export default function ProductModal({ product, open, onOpenChange }: ProductMod
     setTimeout(() => setAdded(false), 2000);
   };
 
-  const categoryNames: Record<string, string> = {
-    buttons: 'Пуговицы',
-    zippers: 'Молнии',
-    threads: 'Нитки',
-    accessories: 'Аксессуары',
-  };
+  const specs = product.specifications && typeof product.specifications === 'object'
+    ? Object.entries(product.specifications).filter(([k]) => k)
+    : [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">{product.name}</DialogTitle>
-          <DialogDescription>
-            <Badge variant="secondary" className="mt-2">
-              {categoryNames[product.category]}
-            </Badge>
+          <DialogDescription asChild>
+            <div className="flex items-center gap-2 mt-2">
+              {product.category && (
+                <Badge variant="secondary">{product.category}</Badge>
+              )}
+              {product.sku && (
+                <span className="text-xs text-muted-foreground font-mono">Арт: {product.sku}</span>
+              )}
+            </div>
           </DialogDescription>
         </DialogHeader>
 
@@ -71,33 +76,35 @@ export default function ProductModal({ product, open, onOpenChange }: ProductMod
           <div className="flex flex-col">
             <div className="mb-6">
               <div className="text-4xl font-bold text-primary mb-4">{product.price}</div>
-              
-              <div className="space-y-4 text-sm text-muted-foreground">
-                <div className="flex items-start gap-2">
-                  <Icon name="Check" size={18} className="text-primary mt-0.5 flex-shrink-0" />
-                  <span>Высокое качество материалов</span>
+
+              {product.description ? (
+                <p className="text-sm text-muted-foreground leading-relaxed">{product.description}</p>
+              ) : (
+                <div className="space-y-3 text-sm text-muted-foreground">
+                  <div className="flex items-start gap-2">
+                    <Icon name="Check" size={18} className="text-primary mt-0.5 flex-shrink-0" />
+                    <span>Высокое качество материалов</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Icon name="Check" size={18} className="text-primary mt-0.5 flex-shrink-0" />
+                    <span>Сертифицированная продукция</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Icon name="Check" size={18} className="text-primary mt-0.5 flex-shrink-0" />
+                    <span>Быстрая доставка по России</span>
+                  </div>
                 </div>
-                <div className="flex items-start gap-2">
-                  <Icon name="Check" size={18} className="text-primary mt-0.5 flex-shrink-0" />
-                  <span>Сертифицированная продукция</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Icon name="Check" size={18} className="text-primary mt-0.5 flex-shrink-0" />
-                  <span>Быстрая доставка по России</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Icon name="Check" size={18} className="text-primary mt-0.5 flex-shrink-0" />
-                  <span>Гарантия возврата 14 дней</span>
-                </div>
-              </div>
+              )}
             </div>
 
             <div className="border-t border-border pt-6 mt-auto">
-              <div className="space-y-3 mb-6">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Артикул:</span>
-                  <span className="font-medium">TK-{product.id.toString().padStart(5, '0')}</span>
-                </div>
+              <div className="space-y-2 mb-6">
+                {product.sku && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Артикул:</span>
+                    <span className="font-medium font-mono">{product.sku}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Наличие:</span>
                   {product.inStock === false ? (
@@ -120,8 +127,8 @@ export default function ProductModal({ product, open, onOpenChange }: ProductMod
 
               <div className="flex gap-3">
                 {product.inStock === false ? (
-                  <Button 
-                    className="flex-1 h-12" 
+                  <Button
+                    className="flex-1 h-12"
                     size="lg"
                     variant="outline"
                     onClick={() => setIsNotifyModalOpen(true)}
@@ -130,8 +137,8 @@ export default function ProductModal({ product, open, onOpenChange }: ProductMod
                     Узнать о поступлении
                   </Button>
                 ) : (
-                  <Button 
-                    className="flex-1 h-12" 
+                  <Button
+                    className="flex-1 h-12"
                     size="lg"
                     onClick={handleAddToCart}
                     disabled={added}
@@ -157,14 +164,19 @@ export default function ProductModal({ product, open, onOpenChange }: ProductMod
           </div>
         </div>
 
-        <div className="mt-6 pt-6 border-t border-border">
-          <h3 className="font-semibold mb-3">Описание товара</h3>
-          <p className="text-muted-foreground text-sm leading-relaxed">
-            Высококачественная швейная фурнитура от проверенных европейских производителей. 
-            Идеально подходит для профессионального использования и домашнего шитья. 
-            Прочная, долговечная и удобная в работе. Соответствует всем стандартам качества.
-          </p>
-        </div>
+        {specs.length > 0 && (
+          <div className="mt-6 pt-6 border-t border-border">
+            <h3 className="font-semibold mb-3">Характеристики</h3>
+            <div className="divide-y divide-border rounded-lg border overflow-hidden">
+              {specs.map(([key, value], i) => (
+                <div key={i} className="flex text-sm">
+                  <span className="w-1/2 px-4 py-2.5 bg-secondary/50 text-muted-foreground">{key}</span>
+                  <span className="w-1/2 px-4 py-2.5 font-medium">{value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="mt-6 p-4 bg-primary/5 rounded-lg flex items-start gap-3">
           <Icon name="Info" size={20} className="text-primary flex-shrink-0 mt-0.5" />
@@ -174,7 +186,7 @@ export default function ProductModal({ product, open, onOpenChange }: ProductMod
           </div>
         </div>
       </DialogContent>
-      <NotifyModal 
+      <NotifyModal
         open={isNotifyModalOpen}
         onOpenChange={setIsNotifyModalOpen}
         productName={product.name}

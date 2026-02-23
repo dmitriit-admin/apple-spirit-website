@@ -16,6 +16,9 @@ interface Product {
   price: string;
   image: string;
   inStock?: boolean;
+  sku?: string | null;
+  description?: string | null;
+  specifications?: Record<string, string> | null;
 }
 
 interface ApiCategory {
@@ -35,6 +38,9 @@ interface ApiProduct {
   price: string;
   image_url: string | null;
   in_stock: boolean;
+  sku: string | null;
+  description: string | null;
+  specifications: Record<string, string> | null;
 }
 
 interface CatalogSectionProps {
@@ -71,6 +77,9 @@ export default function CatalogSection({ initialCategory = 'all' }: CatalogSecti
     price: `${Number(p.price).toLocaleString('ru')} ₽`,
     image: p.image_url || FALLBACK_IMAGE,
     inStock: p.in_stock,
+    sku: p.sku,
+    description: p.description,
+    specifications: p.specifications,
   });
 
   const categories = apiLoaded && apiCategories.length > 0
