@@ -82,19 +82,11 @@ export default function CatalogSection({ initialCategory = 'all' }: CatalogSecti
     specifications: p.specifications,
   });
 
-  const categories = apiLoaded && apiCategories.length > 0
+  const categories = apiLoaded
     ? [{ id: 'all', name: 'Все', icon: 'Package' }, ...apiCategories.map(c => ({ id: c.slug, name: c.name, icon: c.icon || 'Package' }))]
-    : [
-        { id: 'all', name: 'Все', icon: 'Package' },
-        { id: 'buttons', name: 'Пуговицы', icon: 'Circle' },
-        { id: 'zippers', name: 'Молнии', icon: 'Minus' },
-        { id: 'threads', name: 'Нитки', icon: 'Wind' },
-        { id: 'accessories', name: 'Аксессуары', icon: 'Star' },
-        { id: 'ribbons', name: 'Ленты', icon: 'Ribbon' },
-        { id: 'metal', name: 'Металлическая фурнитура', icon: 'Hammer' },
-      ];
+    : [];
 
-  const mainCategories = apiLoaded && apiCategories.length > 0
+  const mainCategories = apiLoaded
     ? apiCategories.map(c => ({
         id: c.slug,
         name: c.name,
@@ -102,14 +94,7 @@ export default function CatalogSection({ initialCategory = 'all' }: CatalogSecti
         image: c.image_url || FALLBACK_IMAGE,
         count: c.product_count,
       }))
-    : [
-        { id: 'buttons', name: 'Пуговицы', icon: 'Circle', image: FALLBACK_IMAGE, count: 0 },
-        { id: 'zippers', name: 'Молнии', icon: 'Minus', image: FALLBACK_IMAGE, count: 0 },
-        { id: 'threads', name: 'Нитки', icon: 'Wind', image: FALLBACK_IMAGE, count: 0 },
-        { id: 'accessories', name: 'Аксессуары', icon: 'Star', image: FALLBACK_IMAGE, count: 0 },
-        { id: 'ribbons', name: 'Ленты', icon: 'Ribbon', image: FALLBACK_IMAGE, count: 0 },
-        { id: 'metal', name: 'Металлическая фурнитура', icon: 'Hammer', image: FALLBACK_IMAGE, count: 0 },
-      ];
+    : [];
 
   const products: Product[] = apiLoaded && apiProducts.length > 0
     ? apiProducts.map(toProduct)
@@ -147,6 +132,19 @@ export default function CatalogSection({ initialCategory = 'all' }: CatalogSecti
           </div>
 
           <div className="fade-on-scroll grid grid-cols-1 md:grid-cols-2 gap-6 mb-16 max-w-5xl mx-auto">
+            {!apiLoaded && Array.from({ length: 4 }).map((_, i) => (
+              <Card key={i} className="overflow-hidden border-2">
+                <CardContent className="p-0">
+                  <div className="grid grid-cols-[140px_1fr] items-center">
+                    <div className="h-[140px] bg-secondary animate-pulse" />
+                    <div className="p-6 space-y-3">
+                      <div className="h-5 bg-secondary rounded animate-pulse w-3/4" />
+                      <div className="h-4 bg-secondary rounded animate-pulse w-1/2" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
             {mainCategories.map((category, idx) => (
               <Card
                 key={category.id}
@@ -191,6 +189,9 @@ export default function CatalogSection({ initialCategory = 'all' }: CatalogSecti
           </div>
 
           <div id="products-list" className="fade-on-scroll flex flex-wrap justify-center gap-3 mb-12">
+            {!apiLoaded && Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="h-9 w-24 bg-secondary rounded-md animate-pulse" />
+            ))}
             {categories.map((cat) => (
               <Button
                 key={cat.id}
