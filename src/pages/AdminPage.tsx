@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
+import ImageUploader from '@/components/ui/image-uploader';
 import { toast } from 'sonner';
 
 const ADMIN_URL = 'https://functions.poehali.dev/7f596fac-a8fe-498a-bf36-7bfa5c3c69c5';
@@ -48,13 +49,11 @@ export default function AdminPage() {
   const [catForm, setCatForm] = useState({ slug: '', name: '', icon: 'Package', image_url: '', sort_order: 0 });
   const [editCat, setEditCat] = useState<Category | null>(null);
   const [catUploading, setCatUploading] = useState(false);
-  const catFileRef = useRef<HTMLInputElement>(null);
 
   // product form
   const [prodForm, setProdForm] = useState({ name: '', category_slug: '', price: '', description: '', image_url: '', in_stock: true, sort_order: 0 });
   const [editProd, setEditProd] = useState<Product | null>(null);
   const [prodUploading, setProdUploading] = useState(false);
-  const prodFileRef = useRef<HTMLInputElement>(null);
 
   const apiCall = async (method: string, path: string, body?: object) => {
     const res = await fetch(`${ADMIN_URL}${path}`, {
@@ -299,55 +298,17 @@ export default function AdminPage() {
                   </div>
                   <div>
                     <Label>Изображение</Label>
-                    <input
-                      ref={catFileRef}
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      className="hidden"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
+                    <ImageUploader
+                      value={catForm.image_url}
+                      onChange={(url) => setCatForm(f => ({ ...f, image_url: url }))}
+                      uploading={catUploading}
+                      onUpload={async (file) => {
                         setCatUploading(true);
                         const url = await uploadImage(file, 'categories');
-                        if (url) setCatForm(f => ({ ...f, image_url: url }));
                         setCatUploading(false);
-                        e.target.value = '';
+                        return url;
                       }}
                     />
-                    {catForm.image_url ? (
-                      <div className="mt-2 relative group w-full aspect-video rounded-lg overflow-hidden bg-secondary">
-                        <img src={catForm.image_url} alt="preview" className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                          <Button size="sm" variant="secondary" onClick={() => catFileRef.current?.click()} disabled={catUploading}>
-                            <Icon name="RefreshCw" size={14} className="mr-1" />
-                            Заменить
-                          </Button>
-                          <Button size="sm" variant="destructive" onClick={() => setCatForm(f => ({ ...f, image_url: '' }))}>
-                            <Icon name="Trash2" size={14} />
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => catFileRef.current?.click()}
-                        disabled={catUploading}
-                        className="mt-2 w-full border-2 border-dashed border-muted-foreground/30 rounded-lg p-6 flex flex-col items-center gap-2 hover:border-primary/50 hover:bg-primary/5 transition-colors cursor-pointer disabled:opacity-50"
-                      >
-                        {catUploading ? (
-                          <>
-                            <Icon name="Loader2" size={24} className="text-muted-foreground animate-spin" />
-                            <span className="text-sm text-muted-foreground">Загружаю...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Icon name="ImagePlus" size={24} className="text-muted-foreground" />
-                            <span className="text-sm text-muted-foreground">Нажмите для выбора файла</span>
-                            <span className="text-xs text-muted-foreground/60">JPG, PNG, WebP до 5 МБ</span>
-                          </>
-                        )}
-                      </button>
-                    )}
                   </div>
                   <div>
                     <Label>Порядок сортировки</Label>
@@ -401,55 +362,17 @@ export default function AdminPage() {
                   </div>
                   <div>
                     <Label>Изображение</Label>
-                    <input
-                      ref={prodFileRef}
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      className="hidden"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
+                    <ImageUploader
+                      value={prodForm.image_url}
+                      onChange={(url) => setProdForm(f => ({ ...f, image_url: url }))}
+                      uploading={prodUploading}
+                      onUpload={async (file) => {
                         setProdUploading(true);
                         const url = await uploadImage(file, 'products');
-                        if (url) setProdForm(f => ({ ...f, image_url: url }));
                         setProdUploading(false);
-                        e.target.value = '';
+                        return url;
                       }}
                     />
-                    {prodForm.image_url ? (
-                      <div className="mt-2 relative group w-full aspect-video rounded-lg overflow-hidden bg-secondary">
-                        <img src={prodForm.image_url} alt="preview" className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                          <Button size="sm" variant="secondary" onClick={() => prodFileRef.current?.click()} disabled={prodUploading}>
-                            <Icon name="RefreshCw" size={14} className="mr-1" />
-                            Заменить
-                          </Button>
-                          <Button size="sm" variant="destructive" onClick={() => setProdForm(f => ({ ...f, image_url: '' }))}>
-                            <Icon name="Trash2" size={14} />
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => prodFileRef.current?.click()}
-                        disabled={prodUploading}
-                        className="mt-2 w-full border-2 border-dashed border-muted-foreground/30 rounded-lg p-6 flex flex-col items-center gap-2 hover:border-primary/50 hover:bg-primary/5 transition-colors cursor-pointer disabled:opacity-50"
-                      >
-                        {prodUploading ? (
-                          <>
-                            <Icon name="Loader2" size={24} className="text-muted-foreground animate-spin" />
-                            <span className="text-sm text-muted-foreground">Загружаю...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Icon name="ImagePlus" size={24} className="text-muted-foreground" />
-                            <span className="text-sm text-muted-foreground">Нажмите для выбора файла</span>
-                            <span className="text-xs text-muted-foreground/60">JPG, PNG, WebP до 5 МБ</span>
-                          </>
-                        )}
-                      </button>
-                    )}
                   </div>
                   <div>
                     <Label>Порядок сортировки</Label>
