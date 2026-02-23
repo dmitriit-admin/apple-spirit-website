@@ -1,5 +1,6 @@
 """
 Админ-панель: CRUD операции для категорий и товаров каталога.
+Роутинг через query-параметр: ?resource=categories|products&id=123
 Требует заголовок X-Admin-Key для авторизации.
 """
 import json
@@ -39,43 +40,32 @@ def handler(event: dict, context) -> dict:
     if not check_auth(event):
         return resp(401, {'error': 'Unauthorized'})
 
-    path = event.get('path', '/')
     method = event.get('httpMethod', 'GET')
+    params = event.get('queryStringParameters') or {}
+    resource = params.get('resource', '')
+    item_id = params.get('id')
+
     body = {}
     if event.get('body'):
         body = json.loads(event['body'])
 
-    # /categories
-    if path.endswith('/categories'):
+    # --- Categories ---
+    if resource == 'categories':
         if method == 'GET':
             return get_categories()
         elif method == 'POST':
             return create_category(body)
+        elif method in ('PUT', 'PATCH') and item_id:
+            return patch_category(item_id, body) if method == 'PATCH' else update_category(item_id, body)
 
-    # /categories/{id}
-    if '/categories/' in path:
-        parts = path.rstrip('/').split('/')
-        cat_id = parts[-1]
-        if method == 'PUT':
-            return update_category(cat_id, body)
-        elif method == 'PATCH':
-            return patch_category(cat_id, body)
-
-    # /products
-    if path.endswith('/products'):
+    # --- Products ---
+    if resource == 'products':
         if method == 'GET':
             return get_products()
         elif method == 'POST':
             return create_product(body)
-
-    # /products/{id}
-    if '/products/' in path:
-        parts = path.rstrip('/').split('/')
-        prod_id = parts[-1]
-        if method == 'PUT':
-            return update_product(prod_id, body)
-        elif method == 'PATCH':
-            return patch_product(prod_id, body)
+        elif method in ('PUT', 'PATCH') and item_id:
+            return patch_product(item_id, body) if method == 'PATCH' else update_product(item_id, body)
 
     return resp(404, {'error': 'Not found'})
 
@@ -146,10 +136,8 @@ def update_category(cat_id, body):
 
 
 def patch_category(cat_id, body):
-    fields = []
-    values = []
-    allowed = ['name', 'slug', 'icon', 'image_url', 'sort_order', 'is_active']
-    for k in allowed:
+    fields, values = [], []
+    for k in ['name', 'slug', 'icon', 'image_url', 'sort_order', 'is_active']:
         if k in body:
             fields.append(f"{k} = %s")
             values.append(body[k])
@@ -158,10 +146,7 @@ def patch_category(cat_id, body):
     values.append(cat_id)
     with get_conn() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute(
-                f"UPDATE categories SET {', '.join(fields)} WHERE id=%s RETURNING *",
-                values
-            )
+            cur.execute(f"UPDATE categories SET {', '.join(fields)} WHERE id=%s RETURNING *", values)
             row = cur.fetchone()
         conn.commit()
     if not row:
@@ -240,10 +225,8 @@ def update_product(prod_id, body):
 
 
 def patch_product(prod_id, body):
-    fields = []
-    values = []
-    allowed = ['name', 'category_slug', 'price', 'description', 'image_url', 'in_stock', 'sort_order', 'is_active']
-    for k in allowed:
+    fields, values = [], []
+    for k in ['name', 'category_slug', 'price', 'description', 'image_url', 'in_stock', 'sort_order', 'is_active']:
         if k in body:
             fields.append(f"{k} = %s")
             values.append(body[k])
@@ -253,10 +236,7 @@ def patch_product(prod_id, body):
     values.append(prod_id)
     with get_conn() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute(
-                f"UPDATE products SET {', '.join(fields)} WHERE id=%s RETURNING *",
-                values
-            )
+            cur.execute(f"UPDATE products SET {', '.join(fields)} WHERE id=%s RETURNING *", values)
             row = cur.fetchone()
         conn.commit()
     if not row:

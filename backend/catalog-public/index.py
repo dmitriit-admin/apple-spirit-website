@@ -30,13 +30,13 @@ def handler(event: dict, context) -> dict:
     if event.get('httpMethod') == 'OPTIONS':
         return {'statusCode': 200, 'headers': CORS_HEADERS, 'body': ''}
 
-    path = event.get('path', '/')
     params = event.get('queryStringParameters') or {}
+    resource = params.get('resource', '')
 
-    if path.endswith('/categories'):
+    if resource == 'categories':
         return get_categories()
 
-    if path.endswith('/products'):
+    if resource == 'products':
         category = params.get('category')
         search = params.get('search', '').strip()
         return get_products(category, search)

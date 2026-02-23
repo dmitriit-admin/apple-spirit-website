@@ -55,8 +55,10 @@ export default function AdminPage() {
   const [editProd, setEditProd] = useState<Product | null>(null);
   const [prodUploading, setProdUploading] = useState(false);
 
-  const apiCall = async (method: string, path: string, body?: object) => {
-    const res = await fetch(`${ADMIN_URL}${path}`, {
+  const apiCall = async (method: string, resource: string, body?: object, id?: number | string) => {
+    const params = new URLSearchParams({ resource });
+    if (id !== undefined) params.set('id', String(id));
+    const res = await fetch(`${ADMIN_URL}?${params}`, {
       method,
       headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
       body: body ? JSON.stringify(body) : undefined,
@@ -95,7 +97,7 @@ export default function AdminPage() {
     if (!adminKey.trim()) { toast.error('Введите пароль'); return; }
     setLoading(true);
     try {
-      const res = await fetch(`${ADMIN_URL}/categories`, {
+      const res = await fetch(`${ADMIN_URL}?resource=categories`, {
         headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
       });
       if (res.status === 401) {
@@ -120,12 +122,12 @@ export default function AdminPage() {
   };
 
   const loadCategories = async () => {
-    const data = await apiCall('GET', '/categories');
+    const data = await apiCall('GET', 'categories');
     if (data.categories) setCategories(data.categories);
   };
 
   const loadProducts = async () => {
-    const data = await apiCall('GET', '/products');
+    const data = await apiCall('GET', 'products');
     if (data.products) setProducts(data.products);
   };
 
@@ -142,9 +144,9 @@ export default function AdminPage() {
     setLoading(true);
     let data;
     if (editCat) {
-      data = await apiCall('PUT', `/categories/${editCat.id}`, catForm);
+      data = await apiCall('PUT', 'categories', catForm, editCat.id);
     } else {
-      data = await apiCall('POST', '/categories', catForm);
+      data = await apiCall('POST', 'categories', catForm);
     }
     if (data.category) {
       toast.success(editCat ? 'Категория обновлена' : 'Категория добавлена');
@@ -158,7 +160,7 @@ export default function AdminPage() {
   };
 
   const toggleCatActive = async (cat: Category) => {
-    await apiCall('PATCH', `/categories/${cat.id}`, { is_active: !cat.is_active });
+    await apiCall('PATCH', 'categories', { is_active: !cat.is_active }, cat.id);
     await loadCategories();
   };
 
@@ -177,9 +179,9 @@ export default function AdminPage() {
     const payload = { ...prodForm, price: Number(prodForm.price) };
     let data;
     if (editProd) {
-      data = await apiCall('PUT', `/products/${editProd.id}`, payload);
+      data = await apiCall('PUT', 'products', payload, editProd.id);
     } else {
-      data = await apiCall('POST', '/products', payload);
+      data = await apiCall('POST', 'products', payload);
     }
     if (data.product) {
       toast.success(editProd ? 'Товар обновлён' : 'Товар добавлен');
@@ -193,12 +195,12 @@ export default function AdminPage() {
   };
 
   const toggleProdActive = async (prod: Product) => {
-    await apiCall('PATCH', `/products/${prod.id}`, { is_active: !prod.is_active });
+    await apiCall('PATCH', 'products', { is_active: !prod.is_active }, prod.id);
     await loadProducts();
   };
 
   const toggleProdStock = async (prod: Product) => {
-    await apiCall('PATCH', `/products/${prod.id}`, { in_stock: !prod.in_stock });
+    await apiCall('PATCH', 'products', { in_stock: !prod.in_stock }, prod.id);
     await loadProducts();
   };
 

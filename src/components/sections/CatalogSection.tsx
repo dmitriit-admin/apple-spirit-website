@@ -55,8 +55,8 @@ export default function CatalogSection({ initialCategory = 'all' }: CatalogSecti
 
   useEffect(() => {
     Promise.all([
-      fetch(`${CATALOG_URL}/categories`).then(r => r.json()),
-      fetch(`${CATALOG_URL}/products`).then(r => r.json()),
+      fetch(`${CATALOG_URL}?resource=categories`).then(r => r.json()),
+      fetch(`${CATALOG_URL}?resource=products`).then(r => r.json()),
     ]).then(([catData, prodData]) => {
       if (catData.categories?.length) setApiCategories(catData.categories);
       if (prodData.products?.length) setApiProducts(prodData.products);
