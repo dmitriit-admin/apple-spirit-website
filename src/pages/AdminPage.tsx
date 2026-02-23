@@ -92,19 +92,29 @@ export default function AdminPage() {
   };
 
   const login = async () => {
+    if (!adminKey.trim()) { toast.error('Введите пароль'); return; }
     setLoading(true);
     try {
-      const data = await apiCall('GET', '/categories');
+      const res = await fetch(`${ADMIN_URL}/categories`, {
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
+      });
+      if (res.status === 401) {
+        localStorage.removeItem('admin_key');
+        toast.error('Неверный пароль');
+        setLoading(false);
+        return;
+      }
+      const data = await res.json();
       if (data.categories !== undefined) {
         setIsAuth(true);
         setCategories(data.categories);
         localStorage.setItem('admin_key', adminKey);
         toast.success('Вход выполнен');
       } else {
-        toast.error('Неверный пароль');
+        toast.error('Неожиданный ответ сервера');
       }
     } catch {
-      toast.error('Ошибка подключения');
+      toast.error('Нет соединения с сервером');
     }
     setLoading(false);
   };
@@ -219,15 +229,22 @@ export default function AdminPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label>Пароль</Label>
-              <Input
-                type="password"
-                value={adminKey}
-                onChange={e => setAdminKey(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && login()}
-                placeholder="Введите пароль"
-                className="mt-1"
-              />
+              <Label>Пароль администратора</Label>
+              <div className="flex gap-2 mt-1">
+                <Input
+                  type="password"
+                  value={adminKey}
+                  onChange={e => setAdminKey(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && login()}
+                  placeholder="Введите пароль"
+                />
+                {adminKey && (
+                  <Button variant="ghost" size="icon" onClick={() => { setAdminKey(''); localStorage.removeItem('admin_key'); }} title="Очистить">
+                    <Icon name="X" size={16} />
+                  </Button>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Пароль задан в настройках проекта (секрет ADMIN_SECRET_KEY)</p>
             </div>
             <Button className="w-full" onClick={login} disabled={loading}>
               {loading ? 'Проверяю...' : 'Войти'}
