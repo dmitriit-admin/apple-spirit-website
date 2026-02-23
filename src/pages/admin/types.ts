@@ -23,6 +23,8 @@ export interface Product {
   in_stock: boolean;
   is_active: boolean;
   sort_order: number;
+  sku: string | null;
+  specifications: Record<string, string> | null;
 }
 
 export type ApiCall = (method: string, resource: string, body?: object, id?: number | string) => Promise<Record<string, unknown>>;

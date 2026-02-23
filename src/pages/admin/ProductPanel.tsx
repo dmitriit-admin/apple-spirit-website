@@ -20,7 +20,25 @@ interface ProductPanelProps {
   onEditStart: (prod: Product) => void;
 }
 
-const EMPTY_FORM = { name: '', category_slug: '', price: '', description: '', image_url: '', in_stock: true, sort_order: 0 };
+const EMPTY_FORM = { name: '', category_slug: '', price: '', description: '', image_url: '', in_stock: true, sort_order: 0, sku: '', specifications: '' };
+
+function specsToText(specs: Record<string, string> | null | undefined): string {
+  if (!specs || typeof specs !== 'object') return '';
+  return Object.entries(specs).map(([k, v]) => `${k}: ${v}`).join('\n');
+}
+
+function textToSpecs(text: string): Record<string, string> {
+  const result: Record<string, string> = {};
+  text.split('\n').forEach(line => {
+    const idx = line.indexOf(':');
+    if (idx > 0) {
+      const k = line.slice(0, idx).trim();
+      const v = line.slice(idx + 1).trim();
+      if (k) result[k] = v;
+    }
+  });
+  return result;
+}
 
 export default function ProductPanel({ products, categories, loading, apiCall, uploadImage, onReload, onEditStart }: ProductPanelProps) {
   const [form, setForm] = useState(EMPTY_FORM);
@@ -37,6 +55,8 @@ export default function ProductPanel({ products, categories, loading, apiCall, u
       image_url: prod.image_url || '',
       in_stock: prod.in_stock,
       sort_order: prod.sort_order,
+      sku: prod.sku || '',
+      specifications: specsToText(prod.specifications),
     });
     onEditStart(prod);
   };
@@ -49,7 +69,7 @@ export default function ProductPanel({ products, categories, loading, apiCall, u
   const save = async () => {
     if (!form.name) { toast.error('Введите название товара'); return; }
     if (!form.price || isNaN(Number(form.price))) { toast.error('Введите корректную цену'); return; }
-    const payload = { ...form, price: Number(form.price) };
+    const payload = { ...form, price: Number(form.price), sku: form.sku || null, specifications: textToSpecs(form.specifications) };
     const data = editProd
       ? await apiCall('PUT', 'products', payload, editProd.id)
       : await apiCall('POST', 'products', payload);
@@ -105,8 +125,17 @@ export default function ProductPanel({ products, categories, loading, apiCall, u
             <Input type="number" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} placeholder="120" className="mt-1" />
           </div>
           <div>
+            <Label>Артикул (SKU)</Label>
+            <Input value={form.sku} onChange={e => setForm({ ...form, sku: e.target.value })} placeholder="ARK-001" className="mt-1" />
+          </div>
+          <div>
             <Label>Описание</Label>
             <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Описание товара..." className="mt-1 resize-none" rows={3} />
+          </div>
+          <div>
+            <Label>Характеристики</Label>
+            <p className="text-xs text-muted-foreground mt-0.5 mb-1">Каждая строка: <span className="font-mono">Название: Значение</span></p>
+            <Textarea value={form.specifications} onChange={e => setForm({ ...form, specifications: e.target.value })} placeholder={"Материал: Пластик\nЦвет: Белый\nРазмер: 15 мм"} className="mt-1 resize-none font-mono text-xs" rows={5} />
           </div>
           <div>
             <Label>Изображение</Label>

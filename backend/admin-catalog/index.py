@@ -173,11 +173,18 @@ def create_product(body):
     name = body.get('name', '').strip()
     if not name:
         return resp(400, {'error': 'name обязателен'})
+    import json as _json
+    specs = body.get('specifications', {})
+    if isinstance(specs, str):
+        try:
+            specs = _json.loads(specs)
+        except Exception:
+            specs = {}
     with get_conn() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute("""
-                INSERT INTO products (name, category_slug, price, description, image_url, in_stock, sort_order, is_active)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO products (name, category_slug, price, description, image_url, in_stock, sort_order, is_active, sku, specifications)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING *
             """, (
                 name,
@@ -188,6 +195,8 @@ def create_product(body):
                 body.get('in_stock', True),
                 body.get('sort_order', 0),
                 body.get('is_active', True),
+                body.get('sku') or None,
+                _json.dumps(specs, ensure_ascii=False),
             ))
             row = dict(cur.fetchone())
         conn.commit()
@@ -198,13 +207,20 @@ def update_product(prod_id, body):
     name = body.get('name', '').strip()
     if not name:
         return resp(400, {'error': 'name обязателен'})
+    import json as _json
+    specs = body.get('specifications', {})
+    if isinstance(specs, str):
+        try:
+            specs = _json.loads(specs)
+        except Exception:
+            specs = {}
     with get_conn() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute("""
                 UPDATE products
                 SET name=%s, category_slug=%s, price=%s, description=%s,
                     image_url=%s, in_stock=%s, sort_order=%s, is_active=%s,
-                    updated_at=NOW()
+                    sku=%s, specifications=%s, updated_at=NOW()
                 WHERE id=%s RETURNING *
             """, (
                 name,
@@ -215,6 +231,8 @@ def update_product(prod_id, body):
                 body.get('in_stock', True),
                 body.get('sort_order', 0),
                 body.get('is_active', True),
+                body.get('sku') or None,
+                _json.dumps(specs, ensure_ascii=False),
                 prod_id,
             ))
             row = cur.fetchone()
@@ -226,7 +244,7 @@ def update_product(prod_id, body):
 
 def patch_product(prod_id, body):
     fields, values = [], []
-    for k in ['name', 'category_slug', 'price', 'description', 'image_url', 'in_stock', 'sort_order', 'is_active']:
+    for k in ['name', 'category_slug', 'price', 'description', 'image_url', 'in_stock', 'sort_order', 'is_active', 'sku', 'specifications']:
         if k in body:
             fields.append(f"{k} = %s")
             values.append(body[k])
