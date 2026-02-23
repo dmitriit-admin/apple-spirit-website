@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,83 @@ import Icon from '@/components/ui/icon';
 import ImageUploader from '@/components/ui/image-uploader';
 import { toast } from 'sonner';
 import { ApiCall, UploadImage } from './types';
+
+type FormatAction = { label: string; icon: string; before: string; after: string; block?: boolean };
+
+const FORMAT_ACTIONS: FormatAction[] = [
+  { label: 'Жирный', icon: 'Bold', before: '<strong>', after: '</strong>' },
+  { label: 'Курсив', icon: 'Italic', before: '<em>', after: '</em>' },
+  { label: 'Заголовок 2', icon: 'Heading2', before: '<h2>', after: '</h2>', block: true },
+  { label: 'Заголовок 3', icon: 'Heading3', before: '<h3>', after: '</h3>', block: true },
+  { label: 'Абзац', icon: 'AlignLeft', before: '<p>', after: '</p>', block: true },
+  { label: 'Список', icon: 'List', before: '<ul>\n  <li>', after: '</li>\n</ul>', block: true },
+  { label: 'Пункт', icon: 'Minus', before: '<li>', after: '</li>' },
+];
+
+function RichEditor({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+  const [preview, setPreview] = useState(false);
+
+  const applyFormat = (action: FormatAction) => {
+    const el = ref.current;
+    if (!el) return;
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+    const selected = value.slice(start, end);
+    const prefix = action.block ? '\n' : '';
+    const insert = `${prefix}${action.before}${selected || 'текст'}${action.after}${prefix}`;
+    const next = value.slice(0, start) + insert + value.slice(end);
+    onChange(next);
+    setTimeout(() => {
+      el.focus();
+      const cursor = start + insert.length;
+      el.setSelectionRange(cursor, cursor);
+    }, 0);
+  };
+
+  return (
+    <div className="border border-input rounded-md overflow-hidden mt-1">
+      {/* Toolbar */}
+      <div className="flex items-center gap-0.5 p-1.5 bg-secondary/50 border-b border-input flex-wrap">
+        {FORMAT_ACTIONS.map(a => (
+          <button
+            key={a.icon}
+            type="button"
+            title={a.label}
+            onClick={() => applyFormat(a)}
+            className="p-1.5 rounded hover:bg-background transition-colors"
+          >
+            <Icon name={a.icon} size={15} fallback="Type" />
+          </button>
+        ))}
+        <div className="ml-auto">
+          <button
+            type="button"
+            onClick={() => setPreview(p => !p)}
+            className={`px-2 py-1 rounded text-xs font-medium transition-colors ${preview ? 'bg-primary text-primary-foreground' : 'hover:bg-background'}`}
+          >
+            {preview ? 'Редактор' : 'Превью'}
+          </button>
+        </div>
+      </div>
+      {preview ? (
+        <div
+          className="prose prose-sm max-w-none p-3 min-h-[200px] text-foreground"
+          dangerouslySetInnerHTML={{ __html: value || '<p class="text-muted-foreground">Пусто</p>' }}
+        />
+      ) : (
+        <textarea
+          ref={ref}
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          placeholder={'<p>Начните писать статью...</p>\n<h2>Заголовок раздела</h2>\n<p>Текст раздела</p>'}
+          className="w-full p-3 min-h-[200px] text-sm font-mono bg-background focus:outline-none resize-y"
+          rows={10}
+        />
+      )}
+    </div>
+  );
+}
 
 export interface Article {
   id: number;
@@ -140,7 +217,7 @@ export default function BlogPanel({ articles, loading, apiCall, uploadImage, onR
             </div>
             <div>
               <Label>Текст статьи</Label>
-              <Textarea value={form.content} onChange={e => setForm(f => ({ ...f, content: e.target.value }))} placeholder="Полный текст статьи..." className="mt-1 resize-none" rows={8} />
+              <RichEditor value={form.content} onChange={v => setForm(f => ({ ...f, content: v }))} />
             </div>
             <div>
               <Label>Изображение</Label>

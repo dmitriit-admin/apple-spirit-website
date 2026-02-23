@@ -118,9 +118,10 @@ export default function BlogPostPage() {
           )}
 
           {article.content ? (
-            <div className="prose prose-lg max-w-none text-foreground leading-relaxed whitespace-pre-wrap">
-              {article.content}
-            </div>
+            <div
+              className="prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-foreground prose-p:text-foreground prose-li:text-foreground prose-strong:text-foreground"
+              dangerouslySetInnerHTML={{ __html: article.content }}
+            />
           ) : (
             <p className="text-muted-foreground">Содержимое статьи не добавлено.</p>
           )}
