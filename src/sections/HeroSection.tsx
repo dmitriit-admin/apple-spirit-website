@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import NewsBanners from '@/components/NewsBanners';
+import { Link } from 'react-router-dom';
 
 export default function HeroSection() {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -31,12 +32,12 @@ export default function HeroSection() {
           </p>
           
           <div className="flex flex-wrap gap-4">
-            <a href="#catalog">
+            <Link to="/catalog">
               <Button size="lg" className="h-14 px-8 text-lg">
                 Смотреть каталог
                 <Icon name="ArrowRight" className="ml-2" size={20} />
               </Button>
-            </a>
+            </Link>
             <a href="#promo">
               <Button size="lg" variant="outline" className="h-14 px-8 text-lg">
                 <Icon name="Gift" className="mr-2" size={20} />
