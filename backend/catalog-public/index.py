@@ -45,6 +45,9 @@ def handler(event: dict, context) -> dict:
         article_id = params.get('id')
         return get_article(article_id) if article_id else get_articles()
 
+    if resource == 'banners':
+        return get_banners()
+
     return resp(404, {'error': 'Not found'})
 
 
@@ -115,3 +118,11 @@ def get_article(article_id):
     if not row:
         return resp(404, {'error': 'Статья не найдена'})
     return resp(200, {'article': dict(row)})
+
+
+def get_banners():
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT * FROM banners WHERE is_active=TRUE ORDER BY sort_order, id")
+            rows = cur.fetchall()
+    return resp(200, {'banners': [dict(r) for r in rows]})

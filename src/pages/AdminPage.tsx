@@ -7,14 +7,16 @@ import AdminLogin from './admin/AdminLogin';
 import CategoryPanel from './admin/CategoryPanel';
 import ProductPanel from './admin/ProductPanel';
 import BlogPanel, { Article } from './admin/BlogPanel';
+import BannersPanel, { Banner } from './admin/BannersPanel';
 
 export default function AdminPage() {
   const [adminKey, setAdminKey] = useState(() => localStorage.getItem('admin_key') || '');
   const [isAuth, setIsAuth] = useState(false);
-  const [tab, setTab] = useState<'categories' | 'products' | 'blog'>('categories');
+  const [tab, setTab] = useState<'categories' | 'products' | 'blog' | 'banners'>('categories');
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
+  const [banners, setBanners] = useState<Banner[]>([]);
   const [loading, setLoading] = useState(false);
 
   const apiCall = async (method: string, resource: string, body?: object, id?: number | string) => {
@@ -94,11 +96,17 @@ export default function AdminPage() {
     if (data.articles) setArticles(data.articles as Article[]);
   };
 
+  const loadBanners = async () => {
+    const data = await apiCall('GET', 'banners');
+    if (data.banners) setBanners(data.banners as Banner[]);
+  };
+
   useEffect(() => {
     if (isAuth) {
       loadCategories();
       loadProducts();
       loadArticles();
+      loadBanners();
     }
   }, [isAuth]);
 
@@ -153,6 +161,13 @@ export default function AdminPage() {
             <Icon name="FileText" size={16} className="mr-2" />
             Блог ({articles.length})
           </Button>
+          <Button
+            variant={tab === 'banners' ? 'default' : 'outline'}
+            onClick={() => setTab('banners')}
+          >
+            <Icon name="Image" size={16} className="mr-2" />
+            Баннеры ({banners.length})
+          </Button>
         </div>
 
         {tab === 'categories' ? (
@@ -174,13 +189,21 @@ export default function AdminPage() {
             onReload={loadProducts}
             onEditStart={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           />
-        ) : (
+        ) : tab === 'blog' ? (
           <BlogPanel
             articles={articles}
             loading={loading}
             apiCall={apiCall}
             uploadImage={uploadImage}
             onReload={loadArticles}
+          />
+        ) : (
+          <BannersPanel
+            banners={banners}
+            loading={loading}
+            apiCall={apiCall}
+            uploadImage={uploadImage}
+            onReload={loadBanners}
           />
         )}
 

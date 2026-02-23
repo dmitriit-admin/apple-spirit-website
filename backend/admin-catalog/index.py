@@ -67,6 +67,19 @@ def handler(event: dict, context) -> dict:
         elif method in ('PUT', 'PATCH') and item_id:
             return patch_product(item_id, body) if method == 'PATCH' else update_product(item_id, body)
 
+    # --- Banners ---
+    if resource == 'banners':
+        if method == 'GET':
+            return get_banners()
+        elif method == 'POST':
+            return create_banner(body)
+        elif method == 'PUT' and item_id:
+            return update_banner(item_id, body)
+        elif method == 'PATCH' and item_id:
+            return patch_banner(item_id, body)
+        elif method == 'DELETE' and item_id:
+            return delete_banner(item_id)
+
     # --- Articles ---
     if resource == 'articles':
         if method == 'GET':
@@ -253,6 +266,100 @@ def update_product(prod_id, body):
     if not row:
         return resp(404, {'error': 'Товар не найден'})
     return resp(200, {'product': dict(row)})
+
+
+# ---- Banners ----
+
+def get_banners():
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT * FROM banners ORDER BY sort_order, id")
+            rows = cur.fetchall()
+    return resp(200, {'banners': [dict(r) for r in rows]})
+
+
+def create_banner(body):
+    title = body.get('title', '').strip()
+    if not title:
+        return resp(400, {'error': 'title обязателен'})
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                INSERT INTO banners (title, description, image_url, badge, button_text, button_url, gradient, is_active, sort_order)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING *
+            """, (
+                title,
+                body.get('description'),
+                body.get('image_url'),
+                body.get('badge', 'Новость'),
+                body.get('button_text', 'Подробнее'),
+                body.get('button_url', '/catalog'),
+                body.get('gradient', 'from-secondary/95 to-muted/90'),
+                body.get('is_active', True),
+                body.get('sort_order', 0),
+            ))
+            row = dict(cur.fetchone())
+        conn.commit()
+    return resp(201, {'banner': row})
+
+
+def update_banner(ban_id, body):
+    title = body.get('title', '').strip()
+    if not title:
+        return resp(400, {'error': 'title обязателен'})
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                UPDATE banners SET title=%s, description=%s, image_url=%s, badge=%s,
+                    button_text=%s, button_url=%s, gradient=%s, is_active=%s, sort_order=%s
+                WHERE id=%s RETURNING *
+            """, (
+                title,
+                body.get('description'),
+                body.get('image_url'),
+                body.get('badge', 'Новость'),
+                body.get('button_text', 'Подробнее'),
+                body.get('button_url', '/catalog'),
+                body.get('gradient', 'from-secondary/95 to-muted/90'),
+                body.get('is_active', True),
+                body.get('sort_order', 0),
+                ban_id,
+            ))
+            row = cur.fetchone()
+        conn.commit()
+    if not row:
+        return resp(404, {'error': 'Баннер не найден'})
+    return resp(200, {'banner': dict(row)})
+
+
+def patch_banner(ban_id, body):
+    fields, values = [], []
+    for k in ['title', 'description', 'image_url', 'badge', 'button_text', 'button_url', 'gradient', 'is_active', 'sort_order']:
+        if k in body:
+            fields.append(f"{k} = %s")
+            values.append(body[k])
+    if not fields:
+        return resp(400, {'error': 'Нет полей для обновления'})
+    values.append(ban_id)
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(f"UPDATE banners SET {', '.join(fields)} WHERE id=%s RETURNING *", values)
+            row = cur.fetchone()
+        conn.commit()
+    if not row:
+        return resp(404, {'error': 'Баннер не найден'})
+    return resp(200, {'banner': dict(row)})
+
+
+def delete_banner(ban_id):
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM banners WHERE id=%s RETURNING id", (ban_id,))
+            row = cur.fetchone()
+        conn.commit()
+    if not row:
+        return resp(404, {'error': 'Баннер не найден'})
+    return resp(200, {'deleted': ban_id})
 
 
 # ---- Articles ----
