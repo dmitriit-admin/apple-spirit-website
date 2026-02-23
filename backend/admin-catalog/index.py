@@ -11,7 +11,7 @@ from psycopg2.extras import RealDictCursor
 
 CORS_HEADERS = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Key',
 }
 
@@ -66,6 +66,19 @@ def handler(event: dict, context) -> dict:
             return create_product(body)
         elif method in ('PUT', 'PATCH') and item_id:
             return patch_product(item_id, body) if method == 'PATCH' else update_product(item_id, body)
+
+    # --- Articles ---
+    if resource == 'articles':
+        if method == 'GET':
+            return get_articles()
+        elif method == 'POST':
+            return create_article(body)
+        elif method == 'PUT' and item_id:
+            return update_article(item_id, body)
+        elif method == 'PATCH' and item_id:
+            return patch_article(item_id, body)
+        elif method == 'DELETE' and item_id:
+            return delete_article(item_id)
 
     return resp(404, {'error': 'Not found'})
 
@@ -240,6 +253,102 @@ def update_product(prod_id, body):
     if not row:
         return resp(404, {'error': 'Товар не найден'})
     return resp(200, {'product': dict(row)})
+
+
+# ---- Articles ----
+
+def get_articles():
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT * FROM articles ORDER BY sort_order, created_at DESC")
+            rows = cur.fetchall()
+    return resp(200, {'articles': [dict(r) for r in rows]})
+
+
+def create_article(body):
+    title = body.get('title', '').strip()
+    slug = body.get('slug', '').strip()
+    if not title or not slug:
+        return resp(400, {'error': 'title и slug обязательны'})
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                INSERT INTO articles (slug, title, excerpt, content, image_url, category, read_time, is_published, sort_order)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING *
+            """, (
+                slug, title,
+                body.get('excerpt'),
+                body.get('content'),
+                body.get('image_url'),
+                body.get('category', 'Статья'),
+                body.get('read_time', '5 мин'),
+                body.get('is_published', True),
+                body.get('sort_order', 0),
+            ))
+            row = dict(cur.fetchone())
+        conn.commit()
+    return resp(201, {'article': row})
+
+
+def update_article(art_id, body):
+    title = body.get('title', '').strip()
+    slug = body.get('slug', '').strip()
+    if not title or not slug:
+        return resp(400, {'error': 'title и slug обязательны'})
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                UPDATE articles SET slug=%s, title=%s, excerpt=%s, content=%s,
+                    image_url=%s, category=%s, read_time=%s, is_published=%s,
+                    sort_order=%s, updated_at=NOW()
+                WHERE id=%s RETURNING *
+            """, (
+                slug, title,
+                body.get('excerpt'),
+                body.get('content'),
+                body.get('image_url'),
+                body.get('category', 'Статья'),
+                body.get('read_time', '5 мин'),
+                body.get('is_published', True),
+                body.get('sort_order', 0),
+                art_id,
+            ))
+            row = cur.fetchone()
+        conn.commit()
+    if not row:
+        return resp(404, {'error': 'Статья не найдена'})
+    return resp(200, {'article': dict(row)})
+
+
+def patch_article(art_id, body):
+    fields, values = [], []
+    for k in ['slug', 'title', 'excerpt', 'content', 'image_url', 'category', 'read_time', 'is_published', 'sort_order']:
+        if k in body:
+            fields.append(f"{k} = %s")
+            values.append(body[k])
+    if not fields:
+        return resp(400, {'error': 'Нет полей для обновления'})
+    fields.append("updated_at = NOW()")
+    values.append(art_id)
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(f"UPDATE articles SET {', '.join(fields)} WHERE id=%s RETURNING *", values)
+            row = cur.fetchone()
+        conn.commit()
+    if not row:
+        return resp(404, {'error': 'Статья не найдена'})
+    return resp(200, {'article': dict(row)})
+
+
+def delete_article(art_id):
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM articles WHERE id=%s RETURNING id", (art_id,))
+            row = cur.fetchone()
+        conn.commit()
+    if not row:
+        return resp(404, {'error': 'Статья не найдена'})
+    return resp(200, {'deleted': art_id})
 
 
 def patch_product(prod_id, body):

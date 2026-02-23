@@ -6,13 +6,15 @@ import { ADMIN_URL, UPLOAD_URL, Category, Product } from './admin/types';
 import AdminLogin from './admin/AdminLogin';
 import CategoryPanel from './admin/CategoryPanel';
 import ProductPanel from './admin/ProductPanel';
+import BlogPanel, { Article } from './admin/BlogPanel';
 
 export default function AdminPage() {
   const [adminKey, setAdminKey] = useState(() => localStorage.getItem('admin_key') || '');
   const [isAuth, setIsAuth] = useState(false);
-  const [tab, setTab] = useState<'categories' | 'products'>('categories');
+  const [tab, setTab] = useState<'categories' | 'products' | 'blog'>('categories');
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(false);
 
   const apiCall = async (method: string, resource: string, body?: object, id?: number | string) => {
@@ -87,10 +89,16 @@ export default function AdminPage() {
     if (data.products) setProducts(data.products as Product[]);
   };
 
+  const loadArticles = async () => {
+    const data = await apiCall('GET', 'articles');
+    if (data.articles) setArticles(data.articles as Article[]);
+  };
+
   useEffect(() => {
     if (isAuth) {
       loadCategories();
       loadProducts();
+      loadArticles();
     }
   }, [isAuth]);
 
@@ -114,7 +122,7 @@ export default function AdminPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold">Админ-панель</h1>
-            <p className="text-muted-foreground mt-1">Управление каталогом товаров</p>
+            <p className="text-muted-foreground mt-1">Управление каталогом и блогом</p>
           </div>
           <Button variant="outline" onClick={() => { setIsAuth(false); localStorage.removeItem('admin_key'); }}>
             <Icon name="LogOut" size={16} className="mr-2" />
@@ -138,6 +146,13 @@ export default function AdminPage() {
             <Icon name="Package" size={16} className="mr-2" />
             Товары ({products.length})
           </Button>
+          <Button
+            variant={tab === 'blog' ? 'default' : 'outline'}
+            onClick={() => setTab('blog')}
+          >
+            <Icon name="FileText" size={16} className="mr-2" />
+            Блог ({articles.length})
+          </Button>
         </div>
 
         {tab === 'categories' ? (
@@ -149,7 +164,7 @@ export default function AdminPage() {
             onReload={loadCategories}
             onEditStart={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           />
-        ) : (
+        ) : tab === 'products' ? (
           <ProductPanel
             products={products}
             categories={categories}
@@ -158,6 +173,14 @@ export default function AdminPage() {
             uploadImage={uploadImage}
             onReload={loadProducts}
             onEditStart={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          />
+        ) : (
+          <BlogPanel
+            articles={articles}
+            loading={loading}
+            apiCall={apiCall}
+            uploadImage={uploadImage}
+            onReload={loadArticles}
           />
         )}
 

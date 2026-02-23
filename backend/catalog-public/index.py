@@ -41,6 +41,10 @@ def handler(event: dict, context) -> dict:
         search = params.get('search', '').strip()
         return get_products(category, search)
 
+    if resource == 'articles':
+        article_id = params.get('id')
+        return get_article(article_id) if article_id else get_articles()
+
     return resp(404, {'error': 'Not found'})
 
 
@@ -89,3 +93,25 @@ def get_products(category=None, search=None):
             """, values)
             rows = cur.fetchall()
     return resp(200, {'products': [dict(r) for r in rows]})
+
+
+def get_articles():
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                SELECT id, slug, title, excerpt, image_url, category, read_time, created_at
+                FROM articles WHERE is_published = TRUE
+                ORDER BY sort_order, created_at DESC
+            """)
+            rows = cur.fetchall()
+    return resp(200, {'articles': [dict(r) for r in rows]})
+
+
+def get_article(article_id):
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT * FROM articles WHERE id=%s AND is_published=TRUE", (article_id,))
+            row = cur.fetchone()
+    if not row:
+        return resp(404, {'error': 'Статья не найдена'})
+    return resp(200, {'article': dict(row)})
