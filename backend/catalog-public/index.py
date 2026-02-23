@@ -80,6 +80,7 @@ def get_products(category=None, search=None):
             cur.execute(f"""
                 SELECT p.id, p.name, p.category_slug, p.price,
                        p.description, p.image_url, p.in_stock,
+                       p.sku, p.specifications,
                        c.name AS category_name
                 FROM products p
                 LEFT JOIN categories c ON c.slug = p.category_slug
