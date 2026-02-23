@@ -51,6 +51,9 @@ def handler(event: dict, context) -> dict:
     if resource == 'promotions':
         return get_promotions()
 
+    if resource == 'settings':
+        return get_settings()
+
     return resp(404, {'error': 'Not found'})
 
 
@@ -137,3 +140,11 @@ def get_promotions():
             cur.execute("SELECT * FROM promotions WHERE is_active=TRUE ORDER BY sort_order, id")
             rows = cur.fetchall()
     return resp(200, {'promotions': [dict(r) for r in rows]})
+
+
+def get_settings():
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT key, value FROM settings")
+            rows = cur.fetchall()
+    return resp(200, {'settings': {r['key']: r['value'] for r in rows}})

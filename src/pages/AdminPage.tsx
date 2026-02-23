@@ -9,11 +9,12 @@ import ProductPanel from './admin/ProductPanel';
 import BlogPanel, { Article } from './admin/BlogPanel';
 import BannersPanel, { Banner } from './admin/BannersPanel';
 import PromotionsPanel, { Promotion } from './admin/PromotionsPanel';
+import ContactsPanel from './admin/ContactsPanel';
 
 export default function AdminPage() {
   const [adminKey, setAdminKey] = useState(() => localStorage.getItem('admin_key') || '');
   const [isAuth, setIsAuth] = useState(false);
-  const [tab, setTab] = useState<'categories' | 'products' | 'blog' | 'banners' | 'promotions'>('categories');
+  const [tab, setTab] = useState<'categories' | 'products' | 'blog' | 'banners' | 'promotions' | 'contacts'>('categories');
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
@@ -183,6 +184,13 @@ export default function AdminPage() {
             <Icon name="Tag" size={16} className="mr-2" />
             Акции ({promotions.length})
           </Button>
+          <Button
+            variant={tab === 'contacts' ? 'default' : 'outline'}
+            onClick={() => setTab('contacts')}
+          >
+            <Icon name="Phone" size={16} className="mr-2" />
+            Контакты
+          </Button>
         </div>
 
         {tab === 'categories' ? (
@@ -220,13 +228,15 @@ export default function AdminPage() {
             uploadImage={uploadImage}
             onReload={loadBanners}
           />
-        ) : (
+        ) : tab === 'promotions' ? (
           <PromotionsPanel
             promotions={promotions}
             loading={loading}
             apiCall={apiCall}
             onReload={loadPromotions}
           />
+        ) : (
+          <ContactsPanel apiCall={apiCall} />
         )}
 
       </div>

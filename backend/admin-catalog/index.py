@@ -80,6 +80,13 @@ def handler(event: dict, context) -> dict:
         elif method == 'DELETE' and item_id:
             return delete_banner(item_id)
 
+    # --- Settings ---
+    if resource == 'settings':
+        if method == 'GET':
+            return get_settings()
+        elif method == 'POST':
+            return save_settings(body)
+
     # --- Promotions ---
     if resource == 'promotions':
         if method == 'GET':
@@ -582,3 +589,29 @@ def patch_product(prod_id, body):
     if not row:
         return resp(404, {'error': 'Товар не найден'})
     return resp(200, {'product': dict(row)})
+
+
+# ---- Settings ----
+
+def get_settings():
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT key, value, label FROM settings ORDER BY key")
+            rows = cur.fetchall()
+    return resp(200, {'settings': {r['key']: {'value': r['value'], 'label': r['label']} for r in rows}})
+
+
+def save_settings(body):
+    updates = body.get('settings', {})
+    if not updates:
+        return resp(400, {'error': 'Нет данных'})
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            for key, value in updates.items():
+                cur.execute("""
+                    INSERT INTO settings (key, value, updated_at)
+                    VALUES (%s, %s, NOW())
+                    ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()
+                """, (key, str(value)))
+        conn.commit()
+    return resp(200, {'saved': True})

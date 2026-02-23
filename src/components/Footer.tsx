@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import { useContacts } from '@/hooks/useContacts';
 
 export default function Footer() {
+  const { contacts: c } = useContacts();
+
   return (
     <footer className="bg-secondary/50 py-16 border-t border-border">
       <div className="container mx-auto px-6">
@@ -65,15 +68,15 @@ export default function Footer() {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="flex items-center gap-2">
                 <Icon name="Phone" size={16} />
-                <a href="tel:+78005007527" className="hover:text-primary transition-colors">8 (800) 500-75-27</a>
+                <a href={`tel:${c.phone_main.replace(/\D/g,'')}`} className="hover:text-primary transition-colors">{c.phone_main}</a>
               </li>
               <li className="flex items-center gap-2">
                 <Icon name="Mail" size={16} />
-                <a href="mailto:info@tkexclusiv.ru" className="hover:text-primary transition-colors">info@tkexclusiv.ru</a>
+                <a href={`mailto:${c.email_main}`} className="hover:text-primary transition-colors">{c.email_main}</a>
               </li>
               <li className="flex items-start gap-2">
                 <Icon name="MapPin" size={16} className="mt-0.5" />
-                <span>г. Москва, ул. Докукина, д. 8, стр. 3</span>
+                <span>{c.address}</span>
               </li>
             </ul>
           </div>
@@ -83,18 +86,15 @@ export default function Footer() {
           <div className="bg-secondary/50 rounded-lg p-6 mb-6">
             <h3 className="font-semibold mb-4 text-center">Реквизиты компании</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-muted-foreground max-w-4xl mx-auto">
-              <div><span className="font-medium">Полное наименование:</span> ООО Торговая Компания «ЭКСКЛЮЗИВ»</div>
-              <div><span className="font-medium">ИНН:</span> 7716634770</div>
-              <div><span className="font-medium">Юридический адрес:</span> 129226, Москва, ул. Докукина, д.8, стр.3</div>
-              <div><span className="font-medium">КПП:</span> 771601001</div>
-              <div><span className="font-medium">Расчетный счет:</span> 40702810300290001324</div>
-              <div><span className="font-medium">ОГРН:</span> 1097746018226 от 22.01.2009 г.</div>
-              <div><span className="font-medium">Банк:</span> филиал «Центральный» Банка ВТБ (ПАО), г. Москва</div>
-              <div><span className="font-medium">ОКПО:</span> 60375858</div>
-              <div><span className="font-medium">Корр. счет:</span> 30101810145250000411</div>
-              <div><span className="font-medium">ОКВЭД:</span> 51.41</div>
-              <div><span className="font-medium">БИК:</span> 044525411</div>
-              <div><span className="font-medium">ОКАТО:</span> 4528577000</div>
+              <div><span className="font-medium">Полное наименование:</span> {c.company_name}</div>
+              <div><span className="font-medium">ИНН:</span> {c.inn}</div>
+              <div><span className="font-medium">Юридический адрес:</span> {c.legal_address}</div>
+              <div><span className="font-medium">КПП:</span> {c.kpp}</div>
+              <div><span className="font-medium">Расчётный счёт:</span> {c.bank_account}</div>
+              <div><span className="font-medium">ОГРН:</span> {c.ogrn}</div>
+              <div><span className="font-medium">Банк:</span> {c.bank_name}</div>
+              <div><span className="font-medium">Корр. счёт:</span> {c.bank_corr}</div>
+              <div><span className="font-medium">БИК:</span> {c.bank_bik}</div>
             </div>
           </div>
           <p className="text-sm text-muted-foreground text-center">© 2024 ТК Эксклюзив. Все права защищены.</p>
